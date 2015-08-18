@@ -41,7 +41,6 @@ Command to run hotspot algorithm on genes listed in file genes_of_interest.txt:
 Contents:
 hotspot_algo.R - R script to execute hotspot detection algorithm
 funcs.R - R script of functions necessary for proper execution of hotspot_algo.R
-maf_subset_ucec.maf - Sample filtered mutation file of somatic substitutions in uterine corpus endometrial carcinoma (UCEC)
 trinucleotide_mutability.txt - Trinucleotide mutability look-up table for calculating position- and gene-specific mutability
 gene_level_mutability.txt - Pre-calculated gene-level mutability based on the gene's trinucleotide contexts
 true_positive_hotspots.txt - List of true positive hotspots used as a part of putative false positives filtering
