@@ -45,7 +45,7 @@ trinucleotide_mutability.txt - Trinucleotide mutability look-up table for calcul
 gene_level_mutability.txt - Pre-calculated gene-level mutability based on the gene's trinucleotide contexts
 true_positive_hotspots.txt - List of true positive hotspots used as a part of putative false positives filtering
 unexpressedgenes_table.txt - Lookup table of gene expression across different cancer types
-genes_of_interest.txt - Sample list of genes to limit hotspot detection
+genes_of_interest.txt - Sample list of genes for hotspot detection
 pan-cancer_probablities.Rdata - Contains pre-calculated binomial probabilites per-codon per-gene, based on pan-cancer somatic mutations
 homopolymer_repeats.bed - BED file with start, stop, sequence composition, and homopolymer length of simple repeats found in codng regions (hg19)
 
