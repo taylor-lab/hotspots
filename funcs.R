@@ -15,12 +15,6 @@ get.alpha=function(k,aa,mu_prot){
 	else return(aa$mu_position[k]/mu_prot)
 }
 
-# returns expected probabilty for the codon given tri nucleotide mutability of the codon and the gene 
-expected.tri.probability=function(tri,recur_count,alpha,aa,p,gene,total.samples=TOTAL_SAMPLES,aa.length){
-	prob=get.probability(gene,aa,sum(aa$count),total.samples,aa.length)
-	return(dbinom(x=recur_count-1,size=total.samples,prob=alpha*prob)*(p[ which(p$gene==gene),tri]/sum(p[p$gene==gene,c(1:32)])))
-}
-
 # returns log10 p-value of the binomial distribution
 get.pvalues=function(k,total.muts,aa.length,mu_prot,aa,gene,min_prob,total.samples=TOTAL_SAMPLES) {
 	prob=max(get.probability(gene,aa,total.muts,total.samples,aa.length),min_prob)
@@ -136,18 +130,18 @@ get.ccf=function(pos,maf) {
 
 # perform binomial test for all mutations observed in gene
 binom.test=function(gene) {
-	cat('   Starting',gene,'...','\n')
+	# cat('   Starting',gene,'...','\n')
 	# Reduce maf down to just of gene G
-	cat('      Looking for mutations in',gene,'...\n')
+	# cat('      Looking for mutations in',gene,'...\n')
 	maf=d[ which(d$Hugo_Symbol==gene), ]
 	# Get count of mutations as each amino acid position
 	aa=table(maf$Amino_Acid_Position)
 	# Get amino acid length of the gene
 	aa.length=max(maf$Amino_Acid_Length)
 
-	# Find the mutability of the gene (pre-calculated and stored in /home/changmt/joc_hypermutation/hotspot/gene_tri_nuc_score_102014_2.txt)
+	# Find the mutability of the gene (pre-calculated)
 	# If gene does not exist, use the average mutability of all genes 
-	cat('      Finding mutability of protein/position...\n')
+	# cat('      Finding mutability of protein/position...\n')
 	ii=which(p$gene==gene)
 	if(any(ii)) mu_protein=p$score[ p$gene==gene ]	else mu_protein=mean(p$score)
 
@@ -168,7 +162,7 @@ binom.test=function(gene) {
 	cutoff=max(as.numeric(quantile(aa$count,0.99)),20)
 	aa$toohot[ which(aa$count > cutoff) ]=TRUE
 
-	cat('      Compiling output...\n')
+	# cat('      Compiling output...\n')
 	info=as.data.frame(do.call('rbind',lapply(aa$pos,get.variant.aa,mf=maf)))
 	colnames(info)=c('Variant_Amino_Acid','Codon_Change','Genomic_Position')
 	cancer.types=as.data.frame(do.call('rbind',lapply(aa$pos,get.cancer.type,mf=maf,d=d)))
@@ -183,7 +177,7 @@ binom.test=function(gene) {
 
 	output$Genomic_Position=as.character(output$Genomic_Position)
 
-	cat('      Correcting for multiple hypothesis...\n')
+	# cat('      Correcting for multiple hypothesis...\n')
 	# q1=p.adjust(pval,method='BY')
 	pval=10^output$log10_pvalue
 	ppval=c(pval,rep(1,aa.length-length(pval)))
@@ -569,8 +563,7 @@ remove.unexpressed.genes=function(i,maf,express) {
 			return(samples < 0.1*tot[1] && samples < 0.1*tot[2])
 		}
 	}
-	# if(maf$TUMORTYPE[i]=='acyc') maf$TUMORTYPE[i]='acc'
-	# tt=which(colnames(express)==maf$TUMORTYPE[i])
+	
 	tt=grep(maf$TUMORTYPE[i],colnames(express))
 	g=which(express$gene_id==maf$Hugo_Symbol[i])
 	if(!any(g)) return(1==2)
