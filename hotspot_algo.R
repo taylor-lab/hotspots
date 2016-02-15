@@ -5,7 +5,7 @@ args = commandArgs(TRUE)
 
 usage="\n  Usage: ./hotspot_algo.R
     --input-maf=[Required: mutation file]
-    --rdata=[Required: Contains tables needed to run hotspot algorithm etc]
+    --rdata=[Required: Rdata object with necessary files for algorithm]
     --true-positive=[Required: List of known true-positives]
     --output-file=[Required: output file to print statistically significant hotspots]
     --gene-query=[Optional (default=all genes in mutation file): List of Hugo Symbol in which to query for hotspots]

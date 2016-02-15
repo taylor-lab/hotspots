@@ -23,7 +23,7 @@ Usage:
 
 ./hotspot_algo.R
     --input-maf=[REQUIRED: mutation file]
-    --rdata=[Required: Contains tables needed to run hotspot algorithm etc]
+    --rdata=[REQUIRED: Rdata object with necessary files for algorithm]
     --true-positive=[REQUIRED: List of known true-positives]
     --output-file=[REQUIRED: output file to print statistically significant hotspots]
     --gene-query=[OPTIONAL (default=all genes in mutation file): List of Hugo Symbol in which to query for hotspots]
