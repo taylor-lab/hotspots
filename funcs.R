@@ -129,7 +129,7 @@ get.ccf=function(pos,maf) {
 }
 
 # perform binomial test for all mutations observed in gene
-binom.test=function(gene) {
+binom.test_snp=function(gene) {
 	# cat('   Starting',gene,'...','\n')
 	# Reduce maf down to just of gene G
 	# cat('      Looking for mutations in',gene,'...\n')
@@ -137,7 +137,7 @@ binom.test=function(gene) {
 	# Get count of mutations as each amino acid position
 	aa=table(maf$Amino_Acid_Position)
 	# Get amino acid length of the gene
-	aa.length=max(maf$Amino_Acid_Length)
+	aa.length=max(maf$Protein_Length)
 
 	# Find the mutability of the gene (pre-calculated)
 	# If gene does not exist, use the average mutability of all genes 
@@ -156,7 +156,8 @@ binom.test=function(gene) {
 
 	af.ranks=as.data.frame(do.call('rbind',lapply(aa$pos,get.af.rank,maf=maf)))
 	colnames(af.ranks)=c('Median_Allele_Freq_Rank','Allele_Freq_Rank')
-	ccfs=unlist(lapply(aa$pos,get.ccf,maf=maf))
+	if('ccf' %in% colnames(maf)) ccfs=unlist(lapply(aa$pos,get.ccf,maf=maf))
+	else ccfs=rep(NA,nrow(aa))
 
 	aa$toohot=FALSE
 	cutoff=max(as.numeric(quantile(aa$count,0.99)),20)
@@ -604,18 +605,17 @@ is.1000G.ac.high_2=function(i,maf,cutoff) {
 	}
 }
 
+# deprecated germline SNP filtering based on 1000/NHLBI
+# putative germline SNPs are filtered based on ExAC with minor AF > 0.06%
+# ExAC r0.2 has been preloaded 
 remove.snps=function(maf) {
 	cat(' ... Removing SNPS\n')
-	ind=unlist(lapply(1:nrow(maf),is.1000G.ac.high_1,maf=maf,cutoff=2))
-	if(any(ind)) maf=maf[-ind, ]
-	ind=unlist(lapply(1:nrow(maf),is.1000G.ac.high_2,maf=maf,cutoff=2))
-	if(any(ind)) maf=maf[-ind, ]
-	return(maf)
+	return(maf[ which(!paste(maf$Chromosome,maf$Start_Position,maf$Tumor_Seq_Allele2) 
+		%in% paste(exacr0_2snps$Chromosome,exacr0_2snps$Position,exacr0_2snps$Alt)), ])
 }
 
-remove.unexpressed.mutations=function(maf,fn) {
+remove.unexpressed.mutations=function(maf,expressiontb) {
 	cat(' ... Removing unexpressed genes\n')
-	expressiontb=read.csv(fn,header=T,as.is=T,sep="\t")
 	ind=unlist(lapply(1:nrow(maf),remove.unexpressed.genes,maf=maf,express=expressiontb))
 	ind=which(ind)
 	if(any(ind)) maf=maf[ -ind, ]
@@ -624,7 +624,7 @@ remove.unexpressed.mutations=function(maf,fn) {
 
 
 
-prepmaf=function(maf,unexpressfn) {
+prepmaf=function(maf,expressiontb) {
 
 	cat('Prepping MAF ...\n')
 
@@ -670,14 +670,15 @@ prepmaf=function(maf,unexpressfn) {
 	}
 	ss=out
 	maf=rbind(maf,ss)
+	
 	# removing mutations that don't match the reference allele
-	maf=maf[ which(maf$Is_Ref), ]
+	# maf=maf[ which(maf$Is_Ref), ]
 
 	# remove putative germline mutations
 	maf=remove.snps(maf)
 
 	# remove mutations in unexpressed genes
-	maf=remove.unexpressed.mutations(maf,unexpressfn)
+	maf=remove.unexpressed.mutations(maf,expressiontb)
 
 	return(maf)
 }

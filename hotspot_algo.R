@@ -1,17 +1,13 @@
 #! /usr/bin/env Rscript 
 
 source('funcs.R')
-setwd(getwd())
 args = commandArgs(TRUE)
 
 usage="\n  Usage: ./hotspot_algo.R
     --input-maf=[Required: mutation file]
-    --gene-mut=[Required: hg19 gene-level mutability]
-    --trinuc-mut=[Required: tri-nucleotide mutability]
-    --prob=[Required: pan-cancer probabilties for basement probabilty]
+    --rdata=[Required: Contains tables needed to run hotspot algorithm etc]
     --true-positive=[Required: List of known true-positives]
     --output-file=[Required: output file to print statistically significant hotspots]
-    --unexpressed-table=[Required: table required to filter unexpressed genes by cancer type]
     --gene-query=[Optional (default=all genes in mutation file): List of Hugo Symbol in which to query for hotspots]
     --homopolymer=[Optional: BED file of homopolyer regions in hg19 for false positive filtering]
     --align100mer=[Optional: BED file of hg19 UCSC alignability track for 100-mer for false positive filtering]
@@ -28,7 +24,7 @@ CENTER_BIAS_FILTER=FALSE
 GENES_INTEREST=FALSE
 
 # Verify that at least required parameters and their values are passed 
-if(length(args)<6) {
+if(length(args)<3) {
 	cat(usage)
 	stop("Incorrect or missing required input!")
 }
@@ -45,48 +41,14 @@ if(is.integer(idx)) {
 }
 
 # Verify mutation file
-idx=grep("--unexpressed-table=",args)
+idx=grep("--rdata=",args)
 if(is.integer(idx)) {
-	unexpressfn=gsub("--unexpressed-table=","",args[idx])
-	if(!file.exists(maf_fn)) {
-		stop("Unable to find unexpressed genes table!")
+	rdata_file=gsub("--rdata=","",args[idx])
+	if(!file.exists(rdata_file)) {
+		stop("Unable to find required Rdata file!")
 	} 
 } else {
-	stop("Missing required --unexpressed-table parameter!")
-}
-
-
-# Verify gene mutability
-idx=grep("--gene-mut=",args)
-if(is.integer(idx)) {
-	gene_mut=gsub("--gene-mut=","",args[idx])
-	if(!file.exists(gene_mut)) {
-		stop("Unable to find gene mutability file!")
-	} 
-} else {
-	stop("Missing required --gene-mut parameter!")
-}
-
-# Verify tri-nucleotide mutability
-idx=grep("--trinuc-mut=",args)
-if(is.integer(idx)) {
-	trinuc_mut=gsub("--trinuc-mut=","",args[idx])
-	if(!file.exists(trinuc_mut)) {
-		stop("Unable to find tri-nucleotide mutability file!")
-	} 
-} else {
-	stop("Missing required --trinuc-mut parameter!")
-}
-
-# Verify pan-cancer probabilities
-idx=grep("--prob=",args)
-if(is.integer(idx)) {
-	base_prob=gsub("--prob=","",args[idx])
-	if(!file.exists(base_prob)) {
-		stop("Unable to find pan-cancer probabilties file!")
-	} 
-} else {
-	stop("Missing required --prob parameter!")
+	stop("Missing required --rdata parameter!")
 }
 
 # Verify output file destination
@@ -178,26 +140,44 @@ if(!suppressMessages(library(data.table,logical.return=TRUE)) |
 
 # read in necessary files
 cat('\n\nReading in files...\n')
-load(base_prob)
+load(rdata_file)
 d=read.csv(maf_fn,header=T,as.is=T,sep="\t",comment.char='#')
-d=prepmaf(d,unexpressfn=unexpressfn)
-p=read.csv(gene_mut,header=T,as.is=T,sep="\t")
-mu=read.csv(trinuc_mut,header=T,as.is=T,sep="\t")
+
+# add additional annotations
+d$Amino_Acid_Change=gsub('p.','',d$HGVSp_Short)
+d$Amino_Acid_Position=unlist(lapply(d$Protein_position,function(x) unlist(strsplit(x,"/"))[1] ))
+d$Protein_Length=unlist(lapply(d$Protein_position,function(x) unlist(strsplit(x,'\\/'))[2]))
+d$Reference_Amino_Acid=unlist(lapply(1:nrow(d), function(x) unlist(strsplit(d$Amino_acids[x],'/'))[1]))
+d$Variant_Amino_Acid=unlist(lapply(1:nrow(d), function(x) unlist(strsplit(d$Amino_acids[x],'/'))[2]))
+d$allele_freq=d$t_alt_count/(d$t_alt_count+d$t_ref_count)
+
+if(!'TUMORTYPE' %in% colnames(d)) d$TUMORTYPE='none'
+if(!'Master_ID' %in% colnames(d)) d$Master_ID=d$Tumor_Sample_Barcode
+
+# get tri nucleotide
+write.table(d,'___temp_maf.tm',row.names=F,quote=F,sep="\t")
+system(command='python make_trinuc_maf.py ___temp_maf.tm ___temp_maf-tri.tm')
+# clean up tmp files
+d=read.csv('___temp_maf-tri.tm',header=T,as.is=T,sep="\t",comment.char='#')
+system(command='rm ___t*')
+
+d=prepmaf(d,expressiontb)
 
 TOTAL_SAMPLES=length(unique(d$Master_ID))
 
 genes=unique(d$Hugo_Symbol)
 if(GENES_INTEREST) { 
 	genes=read.csv(gene_interest_fn,header=F,as.is=T,sep="\t")[,1]
-	ii=which(!genes %in% d$Hugo_Symbol)
-	if(length(ii) > 0) stop(paste(genes[ii],collapse=", "),' not mutated in mutation file\n')
+	genes=genes[ which(genes %in% d$Hugo_Symbol) ]
+	# ii=which(!genes %in% d$Hugo_Symbol)
+	# if(length(ii) > 0) stop(paste(genes[ii],collapse=", "),' not mutated in mutation file\n')
 }
 # set minimum probabily for binomial model
 min_prob=quantile(all_prob,0.2)
 
 # run algorithm
 cat('Running algorithm...\n')
-output=lapply(genes,binom.test)
+output=lapply(genes,binom.test_snp)
 output=do.call('rbind',output)
 
 # filter output to only the significant hits
