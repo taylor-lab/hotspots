@@ -23,12 +23,9 @@ Usage:
 
 ./hotspot_algo.R
     --input-maf=[REQUIRED: mutation file]
-    --gene-mut=[REQUIRED: hg19 gene-level mutability]
-    --trinuc-mut=[REQUIRED: tri-nucleotide mutability]
-    --prob=[REQUIRED: pan-cancer probabilties for basement probabilty]
+    --rdata=[Required: Contains tables needed to run hotspot algorithm etc]
     --true-positive=[REQUIRED: List of known true-positives]
     --output-file=[REQUIRED: output file to print statistically significant hotspots]
-    --unexpressed-table=[REQUIRED: lookup table of gene expression across different cancer types]
     --gene-query=[OPTIONAL (default=all genes in mutation file): List of Hugo Symbol in which to query for hotspots]
     --homopolymer=[OPTIONAL: BED file of homopolyer regions in hg19 for false positive filtering]
     --align100mer=[OPTIONAL: BED file of hg19 UCSC alignability track for 100-mer length sequences for false positive filtering]
@@ -36,18 +33,16 @@ Usage:
     --filter-centerbias=[OPTIONAL (default=FALSE): TRUE|FALSE to identify false positive filtering based on mutation calling center bias]
 
 Command to run hotspot algorithm on genes listed in file genes_of_interest.txt:
-./hotspot_algo.R --input-maf=pancancer_unfiltered.maf --gene-mut=gene_level_mutability.txt --trinuc-mut=trinucleotide_mutability.txt --prob=pan-cancer_probablities.Rdata --gene-query=genes_of_interest.txt --true-positive=true_positive_hotspots.txt --homopolymer=homopolymer_repeats.bed --output-file=sig_hotspots.txt
+./hotspot_algo.R --input-maf=pancancer_unfiltered.maf --rdata=hotspot_algo.Rdata --gene-query=genes_of_interest.txt --true-positive=true_positive_hotspots.txt --output-file=sig_hotspots.txt
 
 Contents:
 hotspot_algo.R - R script to execute hotspot detection algorithm
+hotspot_algo.Rdata - Rdata object with necessary files for algorithm (mutability, expression/germline filters, etc)
 funcs.R - R script of functions necessary for proper execution of hotspot_algo.R
-trinucleotide_mutability.txt - Trinucleotide mutability look-up table for calculating position- and gene-specific mutability
-gene_level_mutability.txt - Pre-calculated gene-level mutability based on the gene's trinucleotide contexts
 true_positive_hotspots.txt - List of true positive hotspots used as a part of putative false positives filtering
-unexpressedgenes_table.txt - Lookup table of gene expression across different cancer types
 genes_of_interest.txt - Sample list of genes for hotspot detection
-pan-cancer_probablities.Rdata - Contains pre-calculated binomial probabilites per-codon per-gene, based on pan-cancer somatic mutations
 homopolymer_repeats.bed - BED file with start, stop, sequence composition, and homopolymer length of simple repeats found in codng regions (hg19)
+minimalist_test_maf.txt - minimalist MAF needed from maf2maf (https://github.com/mskcc/vcf2maf)
 
 Notes:
 --align100mer and --align24mer are optional filters based on how uniquely k-mer sequences align to a region of the hg19 genome. Note, both filters were used as part of this analysis. See more information at http://genome.ucsc.edu/cgi-bin/hgFileUi?db=hg19&g=wgEncodeMapability.
