@@ -1,4 +1,4 @@
-![foobar](https://giant.gfycat.com/CommonDescriptiveFieldspaniel.gif)
+![foobar](http://i.giphy.com/LwhhZsEHFQgSs.gif)
 
 ########################################################################################
 Identifying recurrent mutations in cancer reveals widespread lineage diversity and mutational specificity
