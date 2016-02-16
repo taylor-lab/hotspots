@@ -588,23 +588,6 @@ remove.unexpressed.genes=function(i,maf,express) {
 
 }
 
-is.1000G.ac.high_1=function(i,maf,cutoff) {
-	if(grepl('1000G',maf$dbSNP_RS[i])) {
-		tm=suppressWarnings(as.numeric(as.character(unlist(strsplit(unlist(strsplit(maf$dbSNP_RS[i],'1000G_')),';')))))
-		tm=tm[ !is.na(tm) ]
-		if(tm > cutoff) return(i)
-		if(grepl('NHLBI',maf$dbSNP_RS[i])) return(i)
-	}
-}
-is.1000G.ac.high_2=function(i,maf,cutoff) {
-	if(grepl('1000G',maf$ID[i])) {
-		tm=suppressWarnings(as.numeric(as.character(unlist(strsplit(unlist(strsplit(maf$ID[i],'1000G_')),';')))))
-		tm=tm[ !is.na(tm) ]
-		if(tm > cutoff) return(i)
-		if(grepl('NHLBI',maf$ID[i])) return(i)
-	}
-}
-
 # deprecated germline SNP filtering based on 1000/NHLBI
 # putative germline SNPs are filtered based on ExAC with minor AF > 0.06%
 # ExAC r0.2 has been preloaded 
@@ -637,6 +620,14 @@ prepmaf=function(maf,expressiontb) {
 	#remove indels
 	maf=maf[ which(!maf$Variant_Type%in%c('INS','DEL')), ]
 
+	# add additional annotations
+	maf$Amino_Acid_Change=gsub('p.','',maf$HGVSp_Short)
+	maf$Amino_Acid_Position=unlist(lapply(maf$Protein_position,function(x) unlist(strsplit(x,"/"))[1] ))
+	maf$Protein_Length=as.numeric(unlist(lapply(maf$Protein_position,function(x) unlist(strsplit(x,'\\/'))[2])))
+	maf$Reference_Amino_Acid=unlist(lapply(1:nrow(maf), function(x) unlist(strsplit(maf$Amino_acids[x],'/'))[1]))
+	maf$Variant_Amino_Acid=unlist(lapply(1:nrow(maf), function(x) unlist(strsplit(maf$Amino_acids[x],'/'))[2]))
+	maf$allele_freq=maf$t_alt_count/(maf$t_alt_count+maf$t_ref_count)
+
 	#subset splice_site mutations
 	splice=c('splice_acceptor_variant','splice_donor_variant')
 	ss=maf[ which(maf$Consequence %in% splice), ]
@@ -656,7 +647,7 @@ prepmaf=function(maf,expressiontb) {
 	}
 	# annotating splice site mutations
 	ss=ss[ nchar(ss$Reference_Allele)<3, ]
-	ss$Amino_Acid_Position=ss$Start_Position
+	ss$Amino_Acid_Position=as.numeric(ss$Start_Position)
 	ss$Reference_Amino_Acid='SS'
 	ss$Variant_Amino_Acid='SS'
 	out=c()
@@ -670,15 +661,14 @@ prepmaf=function(maf,expressiontb) {
 	}
 	ss=out
 	maf=rbind(maf,ss)
-	
-	# removing mutations that don't match the reference allele
-	# maf=maf[ which(maf$Is_Ref), ]
 
 	# remove putative germline mutations
 	maf=remove.snps(maf)
 
 	# remove mutations in unexpressed genes
 	maf=remove.unexpressed.mutations(maf,expressiontb)
+	maf$Amino_Acid_Position=as.numeric(maf$Amino_Acid_Position)
+	maf$Variant_Type='SNP'
 
 	return(maf)
 }

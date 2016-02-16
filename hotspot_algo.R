@@ -142,14 +142,7 @@ if(!suppressMessages(library(data.table,logical.return=TRUE)) |
 cat('\n\nReading in files...\n')
 load(rdata_file)
 d=read.csv(maf_fn,header=T,as.is=T,sep="\t",comment.char='#')
-
-# add additional annotations
-d$Amino_Acid_Change=gsub('p.','',d$HGVSp_Short)
-d$Amino_Acid_Position=unlist(lapply(d$Protein_position,function(x) unlist(strsplit(x,"/"))[1] ))
-d$Protein_Length=unlist(lapply(d$Protein_position,function(x) unlist(strsplit(x,'\\/'))[2]))
-d$Reference_Amino_Acid=unlist(lapply(1:nrow(d), function(x) unlist(strsplit(d$Amino_acids[x],'/'))[1]))
-d$Variant_Amino_Acid=unlist(lapply(1:nrow(d), function(x) unlist(strsplit(d$Amino_acids[x],'/'))[2]))
-d$allele_freq=d$t_alt_count/(d$t_alt_count+d$t_ref_count)
+d=prepmaf(d,expressiontb)
 
 if(!'TUMORTYPE' %in% colnames(d)) d$TUMORTYPE='none'
 if(!'Master_ID' %in% colnames(d)) d$Master_ID=d$Tumor_Sample_Barcode
@@ -161,9 +154,11 @@ system(command='python make_trinuc_maf.py ___temp_maf.tm ___temp_maf-tri.tm')
 d=read.csv('___temp_maf-tri.tm',header=T,as.is=T,sep="\t",comment.char='#')
 system(command='rm ___t*')
 
-d=prepmaf(d,expressiontb)
 
 TOTAL_SAMPLES=length(unique(d$Master_ID))
+# set minimum probabily for binomial model
+min_prob=quantile(all_prob,0.2)
+
 
 genes=unique(d$Hugo_Symbol)
 if(GENES_INTEREST) { 
@@ -172,8 +167,6 @@ if(GENES_INTEREST) {
 	# ii=which(!genes %in% d$Hugo_Symbol)
 	# if(length(ii) > 0) stop(paste(genes[ii],collapse=", "),' not mutated in mutation file\n')
 }
-# set minimum probabily for binomial model
-min_prob=quantile(all_prob,0.2)
 
 # run algorithm
 cat('Running algorithm...\n')
