@@ -1,6 +1,6 @@
 ![foobar](http://i.giphy.com/LwhhZsEHFQgSs.gif)
 
-# Identifying recurrent mutations in cancer reveals widespread lineage diversity and mutational specificity
+# Identifying recurrent mutations in cancer reveals widespread lineage diversity and mutational specificity <img src="http://www.cbioportal.org/images/oncokb-flame.svg" alt="" width="50" height="50">
 ### Software and dataset
 
 ##### Description: 
