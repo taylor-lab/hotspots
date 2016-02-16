@@ -30,19 +30,26 @@ Usage:
     --filter-centerbias=[OPTIONAL (default=FALSE): TRUE|FALSE to identify false positive filtering based on mutation calling center bias]
 ```
 Command to run hotspot algorithm on genes listed in file genes_of_interest.txt:
-`./hotspot_algo.R --input-maf=pancancer_unfiltered.maf --rdata=hotspot_algo.Rdata --gene-query=genes_of_interest.txt --true-positive=true_positive_hotspots.txt --output-file=sig_hotspots.txt`
+```
+./hotspot_algo.R \
+	--input-maf=pancancer_unfiltered.maf \
+	--rdata=hotspot_algo.Rdata \
+	--gene-query=genes_of_interest.txt \
+	--true-positive=true_positive_hotspots.txt \
+	--output-file=sig_hotspots.txt
+```
 
 ### Contents:
-hotspot_algo.R - R script to execute hotspot detection algorithm
-hotspot_algo.Rdata - Rdata object with necessary files for algorithm (mutability, expression/germline filters, etc)
-funcs.R - R script of functions necessary for proper execution of hotspot_algo.R
-true_positive_hotspots.txt - List of true positive hotspots used as a part of putative false positives filtering
-genes_of_interest.txt - Sample list of genes for hotspot detection
-homopolymer_repeats.bed - BED file with start, stop, sequence composition, and homopolymer length of simple repeats found in codng regions (hg19)
-minimalist_test_maf.txt - minimalist MAF needed from maf2maf (https://github.com/mskcc/vcf2maf)
+`hotspot_algo.R` - R script to execute hotspot detection algorithm
+`hotspot_algo.Rdata` - Rdata object with necessary files for algorithm (mutability, expression/germline filters, etc)
+`funcs.R` - R script of functions necessary for proper execution of hotspot_algo.R
+`true_positive_hotspots.txt` - List of true positive hotspots used as a part of putative false positives filtering
+`genes_of_interest.txt` - Sample list of genes for hotspot detection
+`homopolymer_repeats.bed` - BED file with start, stop, sequence composition, and homopolymer length of simple repeats found in codng regions (hg19)
+`minimalist_test_maf.txt` - minimalist MAF needed from maf2maf (https://github.com/mskcc/vcf2maf)
 
 ## Notes:
---align100mer and --align24mer are optional filters based on how uniquely k-mer sequences align to a region of the hg19 genome. Note, both filters were used as part of this analysis. See more information at http://genome.ucsc.edu/cgi-bin/hgFileUi?db=hg19&g=wgEncodeMapability.
+`--align100mer` and `--align24mer` are optional filters based on how uniquely k-mer sequences align to a region of the hg19 genome. Note, both filters were used as part of this analysis. See more information at http://genome.ucsc.edu/cgi-bin/hgFileUi?db=hg19&g=wgEncodeMapability.
 The use of these filters will require downloading the 100-mer and 24-mer alignability tracks from UCSC that are not included here:
 	http://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeMapability/wgEncodeCrgMapabilityAlign100mer.bigWig
 	http://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeMapability/wgEncodeCrgMapabilityAlign24mer.bigWig
