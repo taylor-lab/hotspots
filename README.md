@@ -55,7 +55,7 @@ Command to run hotspot algorithm on genes listed in file genes_of_interest.txt:
 
 `homopolymer_repeats.bed` - BED file with start, stop, sequence composition, and homopolymer length of simple repeats found in codng regions (hg19)
 
-`minimalist_test_maf.txt` - minimalist MAF needed from maf2maf (https://github.com/mskcc/vcf2maf)
+`minimalist_test_maf.txt` - minimalist MAF needed from maf2maf. [mskcc/maf2maf](https://github.com/mskcc/vcf2maf)
 
 #### Notes:
 `--align100mer` and `--align24mer` are optional filters based on how uniquely k-mer sequences align to a region of the hg19 genome. Note, both filters were used as part of this analysis. See more information at [ENCODE Mapability](http://genome.ucsc.edu/cgi-bin/hgFileUi?db=hg19&g=wgEncodeMapability).
