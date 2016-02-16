@@ -1,6 +1,6 @@
 ![foobar](http://i.giphy.com/LwhhZsEHFQgSs.gif)
 
-# <img src="http://www.cbioportal.org/images/oncokb-flame.svg" alt="" width="40" height="40">Identifying recurrent mutations in cancer reveals widespread lineage diversity and mutational specificity
+# <a href="http://www.cbioportal.org/"><img border="0" alt="W3Schools" src="http://www.cbioportal.org/images/oncokb-flame.svg" width="40" height="40"> Identifying recurrent mutations in cancer reveals widespread lineage diversity and mutational specificity
 ### Software and dataset
 
 ##### Description: 
