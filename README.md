@@ -41,11 +41,17 @@ Command to run hotspot algorithm on genes listed in file genes_of_interest.txt:
 
 ### Contents:
 `hotspot_algo.R` - R script to execute hotspot detection algorithm
+
 `hotspot_algo.Rdata` - Rdata object with necessary files for algorithm (mutability, expression/germline filters, etc)
+
 `funcs.R` - R script of functions necessary for proper execution of hotspot_algo.R
+
 `true_positive_hotspots.txt` - List of true positive hotspots used as a part of putative false positives filtering
+
 `genes_of_interest.txt` - Sample list of genes for hotspot detection
+
 `homopolymer_repeats.bed` - BED file with start, stop, sequence composition, and homopolymer length of simple repeats found in codng regions (hg19)
+
 `minimalist_test_maf.txt` - minimalist MAF needed from maf2maf (https://github.com/mskcc/vcf2maf)
 
 ## Notes:
