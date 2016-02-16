@@ -17,7 +17,7 @@ source("http://bioconductor.org/biocLite.R")
 biocLite("IRanges","BSgenome.Hsapiens.UCSC.hg19")
 
 Usage:
-
+```
 ./hotspot_algo.R
     --input-maf=[REQUIRED: mutation file]
     --rdata=[REQUIRED: Rdata object with necessary files for algorithm]
@@ -28,9 +28,9 @@ Usage:
     --align100mer=[OPTIONAL: BED file of hg19 UCSC alignability track for 100-mer length sequences for false positive filtering]
     --align24mer=[OPTIONAL: BED file of hg19 UCSC alignability track for 24-mer length sequences for false positive filtering]
     --filter-centerbias=[OPTIONAL (default=FALSE): TRUE|FALSE to identify false positive filtering based on mutation calling center bias]
-
+```
 Command to run hotspot algorithm on genes listed in file genes_of_interest.txt:
-./hotspot_algo.R --input-maf=pancancer_unfiltered.maf --rdata=hotspot_algo.Rdata --gene-query=genes_of_interest.txt --true-positive=true_positive_hotspots.txt --output-file=sig_hotspots.txt
+`./hotspot_algo.R --input-maf=pancancer_unfiltered.maf --rdata=hotspot_algo.Rdata --gene-query=genes_of_interest.txt --true-positive=true_positive_hotspots.txt --output-file=sig_hotspots.txt`
 
 ### Contents:
 hotspot_algo.R - R script to execute hotspot detection algorithm
