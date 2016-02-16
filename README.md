@@ -13,11 +13,13 @@ mutability, gene-specific mutation rates, and major expected patterns of hotspot
 Need R Version 3.0.2 or higher
 Install dependent packages (data.table, IRanges, BSgenome.Hsapiens.UCSC.hg19) as follows:
 
+```
 install.packages("data.table")
 source("http://bioconductor.org/biocLite.R")
 biocLite("IRanges","BSgenome.Hsapiens.UCSC.hg19")
+```
 
-Usage:
+#####Usage:
 ```
 ./hotspot_algo.R
     --input-maf=[REQUIRED: mutation file]
