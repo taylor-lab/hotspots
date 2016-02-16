@@ -1,6 +1,7 @@
 ![foobar](http://i.giphy.com/LwhhZsEHFQgSs.gif)
 
-## Identifying recurrent mutations in cancer reveals widespread lineage diversity and mutational specificity
+# Identifying recurrent mutations in cancer reveals widespread lineage diversity and mutational specificity
+---
 ### Software and dataset
 
 ##### Description: 
@@ -56,7 +57,9 @@ Command to run hotspot algorithm on genes listed in file genes_of_interest.txt:
 
 #### Notes:
 `--align100mer` and `--align24mer` are optional filters based on how uniquely k-mer sequences align to a region of the hg19 genome. Note, both filters were used as part of this analysis. See more information at [ENCODE Mapability](http://genome.ucsc.edu/cgi-bin/hgFileUi?db=hg19&g=wgEncodeMapability).
+
 The use of these filters will require downloading the 100-mer and 24-mer alignability tracks from UCSC that are not included here:
 	[ENCODE CRG Alignability 100-mer](http://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeMapability/wgEncodeCrgMapabilityAlign100mer.bigWig)
 	[ENCODE CRG Alignability 24-mer](http://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeMapability/wgEncodeCrgMapabilityAlign24mer.bigWig)
+
 Convert these downloaded bigWig to bedgraph format, following instructions here: [UCSC BigWig](http://genome.ucsc.edu/goldenpath/help/bigWig.html)
