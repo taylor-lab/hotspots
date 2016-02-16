@@ -4,11 +4,11 @@
 ### Software and dataset
 
 ##### Description: 
-This is a method to identify population-scale recurrent mutations in cancer, based on a binomial
-statisical model incoporating underlying mutational processes including nucleotide context
+This is a method to identify population-scale recurrent mutations in cancer based on a binomial
+statisical model that incoporates underlying mutational processes including nucleotide context
 mutability, gene-specific mutation rates, and major expected patterns of hotspot mutation emergence
 
-#### Dependencies:
+##### Dependencies:
 Need R Version 3.0.2 or higher
 Install dependent packages (data.table, IRanges, BSgenome.Hsapiens.UCSC.hg19) as follows:
 
@@ -41,14 +41,14 @@ Command to run hotspot algorithm on genes listed in file genes_of_interest.txt:
 	--output-file=sig_hotspots.txt
 ```
 
-#### Contents:
-`hotspot_algo.R` - R script to execute hotspot detection algorithm
+#####Contents:
+**[ Required ]** `hotspot_algo.R` - R script to execute hotspot detection algorithm
 
-`hotspot_algo.Rdata` - Rdata object with necessary files for algorithm (mutability, expression/germline filters, etc)
+**[ Required ]** `hotspot_algo.Rdata` - Rdata object with necessary files for algorithm (mutability, expression/germline filters, etc)
 
-`funcs.R` - R script of functions necessary for proper execution of hotspot_algo.R
+**[ Required ]** `funcs.R` - R script of functions necessary for proper execution of hotspot_algo.R
 
-`true_positive_hotspots.txt` - List of true positive hotspots used as a part of putative false positives filtering
+**[ Required ]** `true_positive_hotspots.txt` - List of true positive hotspots used as a part of putative false positives filtering
 
 `genes_of_interest.txt` - Sample list of genes for hotspot detection
 
@@ -56,7 +56,7 @@ Command to run hotspot algorithm on genes listed in file genes_of_interest.txt:
 
 `minimalist_test_maf.txt` - minimalist MAF needed from maf2maf. [mskcc/maf2maf](https://github.com/mskcc/vcf2maf)
 
-#### Notes:
+#####Notes:
 `--align100mer` and `--align24mer` are optional filters based on how uniquely k-mer sequences align to a region of the hg19 genome. Note, both filters were used as part of this analysis. See more information at [ENCODE Mapability](http://genome.ucsc.edu/cgi-bin/hgFileUi?db=hg19&g=wgEncodeMapability).
 
 The use of these filters will require downloading the 100-mer and 24-mer alignability tracks from UCSC that are not included here:
