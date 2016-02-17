@@ -44,9 +44,13 @@ Command to run hotspot algorithm on genes listed in file genes_of_interest.txt:
 
 #####Contents:
 **[ Required ]** `hotspot_algo.R` - R script to execute hotspot detection algorithm
+
 **[ Required ]** `hotspot_algo.Rdata` - Rdata object with necessary files for algorithm (mutability, expression/germline filters, etc)
+
 **[ Required ]** `funcs.R` - R script of functions necessary for proper execution of hotspot_algo.R
+
 `genes_of_interest.txt` - Sample list of genes for hotspot detection
+
 `minimalist_test_maf.txt` - minimalist MAF needed from maf2maf. [mskcc/maf2maf](https://github.com/mskcc/vcf2maf)
 
 #####Notes:
