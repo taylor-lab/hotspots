@@ -423,14 +423,11 @@ get.repeats=function(i,sig,rr) {
 }
 
 # return homopolymer region metrics: TRUE|FALSE if it is a repeat region, the repeat nucleotide(s), and length of repeat region
-annotate.homopolymers=function(sig,fn) {
-
-	# initialize homopolymer region BED file
-	reps=read.csv(fn,header=F,as.is=T,sep="\t")
-	colnames(reps)=c('chromosome','start','end','seq','rep')
+annotate.homopolymers=function(sig,homopolymerbed) {
 
 	# find overlap
-	rep_range=RangedData(IRanges(reps$start,reps$end),space=reps$chromosome,values=paste(reps$rep,nchar(reps$seq)))
+	rep_range=RangedData(IRanges(homopolymerbed$start,homopolymerbed$end),
+		space=homopolymerbed$chromosome,values=paste(homopolymerbed$rep,nchar(homopolymerbed$seq)))
 	out=lapply(1:nrow(sig),get.repeats,sig=sig,rr=rep_range)
 	bb=do.call('rbind',out)
 	colnames(bb)=c('Is_repeat','seq','length')
@@ -592,13 +589,11 @@ remove.unexpressed.genes=function(i,maf,express) {
 # putative germline SNPs are filtered based on ExAC with minor AF > 0.06%
 # ExAC r0.2 has been preloaded 
 remove.snps=function(maf) {
-	cat(' ... Removing SNPS\n')
 	return(maf[ which(!paste(maf$Chromosome,maf$Start_Position,maf$Tumor_Seq_Allele2) 
 		%in% paste(exacr0_2snps$Chromosome,exacr0_2snps$Position,exacr0_2snps$Alt)), ])
 }
 
 remove.unexpressed.mutations=function(maf,expressiontb) {
-	cat(' ... Removing unexpressed genes\n')
 	ind=unlist(lapply(1:nrow(maf),remove.unexpressed.genes,maf=maf,express=expressiontb))
 	ind=which(ind)
 	if(any(ind)) maf=maf[ -ind, ]
@@ -609,18 +604,18 @@ remove.unexpressed.mutations=function(maf,expressiontb) {
 
 prepmaf=function(maf,expressiontb) {
 
-	cat('Prepping MAF ...\n')
-
+	cat('Prepping MAF for analysis ...\n')
 	#only non-indel, coding mutations
 	coding=c('initiator_codon_variant','missense_variant','splice_acceptor_variant',
 		'splice_donor_variant','stop_gained','stop_lost','stop_retained_variant','synonymous_variant')
-	cat(' ... Removing non-coding mutations\n')
+	cat(' ... Reducing MAF to protein-coding substitutions\n')
 	maf=maf[ which(maf$Consequence %in% coding & maf$CANONICAL=='YES' & maf$BIOTYPE=='protein_coding'), ]
-	
 	#remove indels
 	maf=maf[ which(!maf$Variant_Type%in%c('INS','DEL')), ]
 
 	# add additional annotations
+	if(!'TUMORTYPE' %in% colnames(maf)) maf$TUMORTYPE='none'
+	if(!'Master_ID' %in% colnames(maf)) maf$Master_ID=maf$Tumor_Sample_Barcode
 	maf$Amino_Acid_Change=gsub('p.','',maf$HGVSp_Short)
 	maf$Amino_Acid_Position=unlist(lapply(maf$Protein_position,function(x) unlist(strsplit(x,"/"))[1] ))
 	maf$Protein_Length=as.numeric(unlist(lapply(maf$Protein_position,function(x) unlist(strsplit(x,'\\/'))[2])))
@@ -633,7 +628,7 @@ prepmaf=function(maf,expressiontb) {
 	ss=maf[ which(maf$Consequence %in% splice), ]
 	maf=maf[ which(!maf$Consequence %in% splice), ]
 
-	cat(' ... Annotating maf\n')
+	cat(' ... Re-annotating substitutions\n')
 	# annotating oligo mutations
 	i=which(nchar(maf$Reference_Amino_Acid)!=1 & nchar(maf$Variant_Amino_Acid)!=1 & !grepl('ext',maf$Reference_Amino_Acid))
 	if(any(i)) {
@@ -663,9 +658,11 @@ prepmaf=function(maf,expressiontb) {
 	maf=rbind(maf,ss)
 
 	# remove putative germline mutations
+	cat(' ... Removing putative germline SNPs based on ExAC r0.2\n')
 	maf=remove.snps(maf)
 
 	# remove mutations in unexpressed genes
+	cat(' ... Removing unexpressed genes\n')
 	maf=remove.unexpressed.mutations(maf,expressiontb)
 	maf$Amino_Acid_Position=as.numeric(maf$Amino_Acid_Position)
 	maf$Variant_Type='SNP'

@@ -17,7 +17,7 @@ tof = open(to_maf, 'w')
 tmpf = open("___tmp.maf",'w')
 
 # First get rid of non-SNP mutations
-print "Ignoring non-SNP mutations"
+print " ... Ignoring non-SNP mutations"
 firstline = fromf.readline()
 while firstline.startswith("#"):
 	firstline = fromf.readline()
@@ -34,7 +34,7 @@ tmpf.write(join(map(lambda x: join(x, '\t'), lines), '\n'))
 tmpf.flush()
 
 # Make bed file of regions
-print "Making bed file"
+print " ... Making bed file"
 grep_ps = subprocess.Popen(["grep", "-Ev", "^#|^Hugo", "___tmp.maf"], stdout=subprocess.PIPE)
 cut_ps = subprocess.Popen("cut -f5-7".split(" "), stdin=grep_ps.stdout, stdout=subprocess.PIPE)
 awk_ps = subprocess.Popen(["awk", "{OFS=\"\\t\"; print $1,$2-2,$3+1}"], stdin=cut_ps.stdout, stdout=subprocess.PIPE)
@@ -44,11 +44,11 @@ bedf.close()
 
 
 # Fetch regions
-print "Getting regions"
+print " ... Getting regions"
 subprocess.call("bedtools getfasta -tab -fi /opt/common/CentOS_6-dev/vep/v81/homo_sapiens/81_GRCh37/Homo_sapiens.GRCh37.75.dna.primary_assembly.fa -bed ___tmp.bed -fo ___tmp.tsv".split(" "))
 
 # Add trinuc to lines
-print "Adding trinucs (normalized to start from C or T)"
+print " ... Adding trinucs (normalized to start from C or T)"
 lines[0].append("Ref_Tri")
 trinucf = open("___tmp.tsv","r")
 i = 0
@@ -72,8 +72,8 @@ for line in trinucf:
 		pass
 	lines[i].append(trinuc)
 
-print "Writing to %s"%to_maf
+print " ... Writing to %s"%to_maf
 tof.write(join(map(lambda x: join(x, '\t'), lines), '\n'))
 
-print "Cleaning up"
+print " ... Cleaning up"
 subprocess.call("rm -f ___tmp*".split(" "))
