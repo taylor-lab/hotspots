@@ -13,7 +13,7 @@ mutability, gene-specific mutation rates, and major expected patterns of hotspot
 
 ##### Dependencies:
 Need R Version 3.0.2 or higher
-Install dependent packages (data.table, IRanges, BSgenome.Hsapiens.UCSC.hg19) as follows:
+Install dependent packages (**data.table**, **IRanges**, **BSgenome.Hsapiens.UCSC.hg19**) as follows:
 
 ```
 install.packages("data.table")
