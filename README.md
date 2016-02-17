@@ -45,7 +45,7 @@ Command to run hotspot algorithm on genes listed in file genes_of_interest.txt:
 #####Contents:
 **[ Required ]** `hotspot_algo.R` - R script to execute hotspot detection algorithm
 
-**[ Required ]** `hotspot_algo.Rdata` - Rdata object with necessary files for algorithm (mutability, expression/germline filters, etc)
+**[ Required ]** `hotspot_algo.Rdata` - Rdata object with necessary files for algorithm (mutability, expression filters, etc)
 
 **[ Required ]** `funcs.R` - R script of functions necessary for proper execution of hotspot_algo.R
 
