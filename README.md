@@ -2,7 +2,7 @@
 
 Identifying recurrent mutations in cancer reveals widespread lineage diversity and mutational specificity
 ---
-<img border="0" alt="" src="http://www.cbioportal.org/images/oncokb-flame.svg" width="40" height="40"><img border="0" alt="" src="http://www.cbioportal.org/images/cbioportal_logo.png" width="100" height="40">
+<img border="0" alt="" src="http://www.cbioportal.org/images/oncokb-flame.svg" width="40" height="40">   [<img border="0" alt="" src="http://www.cbioportal.org/images/cbioportal_logo.png" width="165" height="40">](http://www.cbioportal.org/)
 ### Software and dataset
 
 ##### Description: 
