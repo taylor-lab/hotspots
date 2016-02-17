@@ -149,7 +149,7 @@ if(!suppressMessages(library(data.table,logical.return=TRUE)) |
 
 # read in necessary files
 load(rdata_file)
-cat('\n\nReading in MAF...\n')
+cat('\nReading in MAF...\n')
 d=read.csv(maf_fn,header=T,as.is=T,sep="\t",comment.char='#')
 d=prepmaf(d,expressiontb)
 
