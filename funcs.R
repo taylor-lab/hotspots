@@ -378,19 +378,7 @@ annotate.entropy=function(sig) {
 }
 
 # return TRUE|FALSE of whether hotspot is a true positive
-annotate.true.positives=function(sig,true_pos_fn) {
-
-	# initialize true-positive files
-	dmp=read.delim(true_pos_fn,header=T,as.is=T)
-	colnames(dmp)=c("gene","mutation")
-
-	# remove indels or exon-level mutaitons
-	dmp=dmp[-which(grepl("fs|del|exon|_|[>]",dmp$mutation)),]
-	dmp$ref=substring(dmp$mutation,0,1)
-	dmp$alt=NA
-	dmp$aa_position=gsub("[A-Z]+","",dmp$mutation)
-	dmp$aa_position=as.numeric(gsub(" .*$","",dmp$aa_position))
-	dmp$id=paste(dmp$gene,dmp$aa_position,sep="-")
+annotate.true.positives=function(sig,dmp) {
 
 	# return TRUE if hotspot mutation is in true-positive file
 	tp=rep(FALSE,nrow(sig))

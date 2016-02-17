@@ -58,18 +58,6 @@ if(is.integer(idx)) {
 	stop("Missing required --output-file parameter!")
 }
 
-
-# Check for true positive file
-idx=grep("--true-positive=",args)
-if(is.integer(idx)) {
-	true_pos_fn=gsub("--true-positive=","",args[idx])
-	if(!file.exists(true_pos_fn)) {
-		stop("Unable to find true-positive file!")
-	} 
-} else {
-	stop("Missing required --true-positives parameter!")
-}
-
 # Check for gene of interest file
 idx=grep("--gene-query",args)
 if(length(idx)!=0) {
@@ -160,7 +148,7 @@ system(command='python make_trinuc_maf.py ___temp_maf.tm ___temp_maf-tri.tm')
 # clean up tmp files
 d=read.csv('___temp_maf-tri.tm',header=T,as.is=T,sep="\t",comment.char='#')
 system(command='rm ___t*')
-
+cat('\nFinished prepping MAF!\n')
 
 TOTAL_SAMPLES=length(unique(d$Master_ID))
 # set minimum probabily for binomial model
@@ -211,7 +199,7 @@ if(CENTER_BIAS_FILTER) {
 # annotating sequence entropy
 output=cbind(output,annotate.entropy(output))
 # annotating known true positives based on input file
-output=cbind(output,'TP'=as.logical(annotate.true.positives(output,true_pos_fn)))
+output=cbind(output,'TP'=as.logical(annotate.true.positives(output,dmp)))
 
 # removing putative false positives
 cat('Post-hoc filtering...\n')
@@ -225,7 +213,7 @@ output=output[ which(output$reason==''), ]
 # write output
 cat('Writing output...\n')
 write.table(output,output_fn,quote=F,row.names=F,sep="\t")
-
+cat('Completed!\n')
 
 
 
