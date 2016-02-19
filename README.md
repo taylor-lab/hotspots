@@ -1,6 +1,6 @@
 ![](http://i.giphy.com/LwhhZsEHFQgSs.gif)
 
-#Identifying recurrent mutations in cancer reveals widespread lineage diversity and mutational specificity[<img target="_blank" align="right" border="0" alt="" src="http://www.cbioportal.org/images/cbioportal_logo.png" width="125" height="30">](http://www.cbioportal.org/)    <img align="right" border="0" alt="" src="http://www.cbioportal.org/images/oncokb-flame.svg" width="30" height="30">
+#Identifying recurrent mutations in cancer[<img target="_blank" align="right" border="0" alt="" src="http://www.cbioportal.org/images/cbioportal_logo.png" width="125" height="30">](http://www.cbioportal.org/)    <img align="right" border="0" alt="" src="http://www.cbioportal.org/images/oncokb-flame.svg" width="30" height="30">
 
 
 
