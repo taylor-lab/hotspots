@@ -130,9 +130,8 @@ get.ccf=function(pos,maf) {
 
 # perform binomial test for all mutations observed in gene
 binom.test_snp=function(gene) {
-	# cat('   Starting',gene,'...','\n')
+
 	# Reduce maf down to just of gene G
-	# cat('      Looking for mutations in',gene,'...\n')
 	maf=d[ which(d$Hugo_Symbol==gene), ]
 	# Get count of mutations as each amino acid position
 	aa=table(maf$Amino_Acid_Position)
@@ -141,7 +140,6 @@ binom.test_snp=function(gene) {
 
 	# Find the mutability of the gene (pre-calculated)
 	# If gene does not exist, use the average mutability of all genes 
-	# cat('      Finding mutability of protein/position...\n')
 	ii=which(p$gene==gene)
 	if(any(ii)) mu_protein=p$score[ p$gene==gene ]	else mu_protein=mean(p$score)
 
@@ -175,15 +173,11 @@ binom.test_snp=function(gene) {
 		'Allele_Freq_Rank'=af.ranks$Allele_Freq_Rank,'SNP_ID'=unlist(lapply(aa$pos,get.rsid,maf=maf)),info,'Tumortypes'=cancer.types)
 	output=cbind(output,'Tri-nucleotides'=aa$tri, 'Mutability'=aa$mu_position,'mu_protein'=rep(mu_protein,nrow(aa)))
 	output=cbind(output,'ccf'=ccfs)
-
 	output$Genomic_Position=as.character(output$Genomic_Position)
 
-	# cat('      Correcting for multiple hypothesis...\n')
-	# q1=p.adjust(pval,method='BY')
 	pval=10^output$log10_pvalue
 	ppval=c(pval,rep(1,aa.length-length(pval)))
 	q2=p.adjust(ppval,method='BY')[1:length(pval)]
-	# output=cbind(output,'qvalue1'=q1,'qvalue2'=q2)
 	output=cbind(output,'qvalue'=q2)
 
 	# sorting by q-value
