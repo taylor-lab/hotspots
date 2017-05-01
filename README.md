@@ -21,7 +21,7 @@ source("http://bioconductor.org/biocLite.R")
 biocLite("IRanges","BSgenome.Hsapiens.UCSC.hg19")
 ```
 
-####Usage:
+#### Usage:
 ```
 ./hotspot_algo.R
     --input-maf=[REQUIRED: mutation file]
@@ -42,7 +42,7 @@ Command to run hotspot algorithm on genes listed in file genes_of_interest.txt:
 	--output-file=sig_hotspots.txt
 ```
 
-####Contents:
+#### Contents:
 **[ Required ]** `hotspot_algo.R` - R script to execute hotspot detection algorithm
 
 **[ Required ]** `hotspot_algo.Rdata` - Rdata object with necessary files for algorithm (mutability, expression filters, etc)
@@ -53,7 +53,7 @@ Command to run hotspot algorithm on genes listed in file genes_of_interest.txt:
 
 `minimalist_test_maf.txt` - minimalist MAF needed from maf2maf. [mskcc/maf2maf](https://github.com/mskcc/vcf2maf)
 
-####Notes:
+#### Notes:
 `--align100mer` and `--align24mer` are optional filters based on how uniquely k-mer sequences align to a region of the hg19 genome. Note, both filters were used as part of this analysis. See more information at [ENCODE Mapability](http://genome.ucsc.edu/cgi-bin/hgFileUi?db=hg19&g=wgEncodeMapability).
 
 The use of these filters will require downloading the 100-mer and 24-mer alignability tracks from UCSC that are not included here:
