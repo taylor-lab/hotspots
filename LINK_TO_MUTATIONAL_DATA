@@ -1,5 +1,8 @@
-Access to the full mutational data can be obtained here: https://drive.google.com/open?id=0B1tQDSL9FmNLTmo1dl9SRF9USUE
-Note, file is ~1.8G in size. md5sum: 94a3538afdbfbc8b52c75914c60c9f78
+Access to the full mutational data can be obtained here: 
+
+- V1: https://drive.google.com/open?id=0B1tQDSL9FmNLTmo1dl9SRF9USUE (~1.8G, md5sum: 94a3538afdbfbc8b52c75914c60c9f78)
+- V2: http://download.cbioportal.org/cancerhotspots/cancerhotspots.v2.maf.gz (~644M, gzipped, md5sum: 8372c12ece17398595940a2d705c44c2)
+
 
 The first 34 columns are standard MAF format, and described here:
 
