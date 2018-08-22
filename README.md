@@ -1,13 +1,11 @@
-
 [![Build Status](https://travis-ci.org/taylor-lab/hotspots.svg?branch=add_tests)](https://travis-ci.org/taylor-lab/hotspots)
 [![codecov.io](https://img.shields.io/codecov/c/github/taylor-lab/hotspots.svg)](https://codecov.io/github/taylor-lab/hotspots?branch=add_tests)
 
 
 ## Identifying recurrent mutations in cancer
 
-[<img target="_blank" align="right" border="0" alt="" src="http://www.cbioportal.org/images/cbioportal_logo.png" width="125" height="30">](http://www.cbioportal.org/) 
-<img align="right" border="0" alt="" src="http://www.cbioportal.org/images/oncokb-flame.svg" width="30" height="30">(http://oncokb.org/)
-
+[<img target="_blank" align="right" border="0" alt="" src="cbioportal_logo.png" width="125" height="30">](http://www.cbioportal.org/) 
+[<img align="right" border="0" alt="" src="oncokb.png" width="30" height="30">](http://oncokb.org/)
 
 ### Description
 
