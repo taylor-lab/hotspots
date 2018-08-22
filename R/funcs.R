@@ -25,10 +25,25 @@ get.probability=function(gene, aa, total.muts, total.samples, aa.length) {
 	return((1/aa.length)*(total.muts/total.samples))
 }
 
+
+#' @name get.alpha
+#' @title returns the mutability of the codon given the gene
+#' @description
+#'
+#' returns the mutability of the codon given the gene
+#'
+#' @param k numeric first argument
+#' @param aa numeric second argument
+#' @param mu_pro numeric third argument
+#' @return aa$mu_position[k]/mu_prot
 # returns the mutability of the codon given the gene
-get.alpha=function(k,aa,mu_prot){
-	if(is.na(aa$mu_position[k])) return(1)
-	else return(aa$mu_position[k]/mu_prot)
+get.alpha=function(k, aa, mu_prot){
+	if(is.na(aa$mu_position[k])){
+		return(1)
+	}
+	else{
+		return(aa$mu_position[k]/mu_prot)
+	}
 }
 
 # returns log10 p-value of the binomial distribution
