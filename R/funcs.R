@@ -18,6 +18,7 @@
 #' @param total.samples numeric fourth argument
 #' @param aa.length numeric fifth argument
 #' @return numeric (1/aa.length)*(total.muts/total.samples)
+
 get.probability=function(gene, aa, total.muts, total.samples, aa.length) {
 	top=sum(aa$count[which(aa$toohot)])
 	aa.length=aa.length-length(which(aa$toohot))
@@ -35,8 +36,8 @@ get.probability=function(gene, aa, total.muts, total.samples, aa.length) {
 #' @param k numeric first argument
 #' @param aa numeric second argument
 #' @param mu_pro numeric third argument
-#' @return aa$mu_position[k]/mu_prot
-# returns the mutability of the codon given the gene
+#' @return numeric (aa$mu_position[k]/mu_prot)
+
 get.alpha=function(k, aa, mu_prot){
 	if(is.na(aa$mu_position[k])){
 		return(1)
@@ -46,14 +47,35 @@ get.alpha=function(k, aa, mu_prot){
 	}
 }
 
-# returns log10 p-value of the binomial distribution
-get.pvalues=function(k,total.muts,aa.length,mu_prot,aa,gene,min_prob,total.samples=TOTAL_SAMPLES) {
+
+#' @name get.pvalues
+#' @title returns log10 p-value of the binomial distribution
+#' @description
+#'
+#' returns log10 p-value of the binomial distribution
+#'
+#' @param k numeric first argument
+#' @param aa numeric second argument
+#' @param mu_pro numeric third argument
+#' @return pbinom(as.numeric(as.character(aa$count[k]))-1,size=total.samples,prob=prob,lower.tail=FALSE,log.p=TRUE)/log(10,exp(1))
+get.pvalues=function(k, total.muts, aa.length, mu_prot, aa, gene,min_prob, total.samples=TOTAL_SAMPLES) {
 	prob=max(get.probability(gene,aa,total.muts,total.samples,aa.length),min_prob)
 	alpha=get.alpha(k,aa,mu_prot)
 	prob=prob*alpha
 	pbinom(as.numeric(as.character(aa$count[k]))-1,size=total.samples,prob=prob,
 		lower.tail=FALSE,log.p=TRUE)/log(10,exp(1))
 }
+
+#' @name get.alpha
+#' @title returns the mutability of the codon given the gene
+#' @description
+#'
+#' returns the mutability of the codon given the gene
+#'
+#' @param k numeric first argument
+#' @param aa numeric second argument
+#' @param mu_pro numeric third argument
+#' @return returns the table and column names of table into a single string
 
 # returns the table and column names of table into a single string 
 combine=function(tb,sep=":") {
