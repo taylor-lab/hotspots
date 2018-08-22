@@ -18,8 +18,7 @@
 #' @param total.samples numeric fourth argument
 #' @param aa.length numeric fifth argument
 #' @return numeric (1/aa.length)*(total.muts/total.samples)
-
-get.probability=function(gene, aa, total.muts, total.samples, aa.length) {
+get.probability = function(gene, aa, total.muts, total.samples, aa.length){
 	top=sum(aa$count[which(aa$toohot)])
 	aa.length=aa.length-length(which(aa$toohot))
 	total.muts=total.muts-top
@@ -35,14 +34,12 @@ get.probability=function(gene, aa, total.muts, total.samples, aa.length) {
 #'
 #' @param k numeric first argument
 #' @param aa numeric second argument
-#' @param mu_pro numeric third argument
+#' @param mu_prot numeric third argument
 #' @return numeric (aa$mu_position[k]/mu_prot)
-
-get.alpha=function(k, aa, mu_prot){
+get.alpha = function(k, aa, mu_prot){
 	if(is.na(aa$mu_position[k])){
 		return(1)
-	}
-	else{
+	} else{
 		return(aa$mu_position[k]/mu_prot)
 	}
 }
@@ -55,10 +52,15 @@ get.alpha=function(k, aa, mu_prot){
 #' returns log10 p-value of the binomial distribution
 #'
 #' @param k numeric first argument
-#' @param aa numeric second argument
-#' @param mu_pro numeric third argument
+#' @param total.muts numeric second argument
+#' @param as.length numeric third argument
+#' @param mu_prot numeric fourth argument
+#' @param aa numeric fifth argument
+#' @param gene numeric sixth argument
+#' @param min_prob numeric seventh argument
+#' @param total.samples numeric seventh argument
 #' @return pbinom(as.numeric(as.character(aa$count[k]))-1,size=total.samples,prob=prob,lower.tail=FALSE,log.p=TRUE)/log(10,exp(1))
-get.pvalues=function(k, total.muts, aa.length, mu_prot, aa, gene,min_prob, total.samples=TOTAL_SAMPLES) {
+get.pvalues = function(k, total.muts, aa.length, mu_prot, aa, gene, min_prob, total.samples=TOTAL_SAMPLES){
 	prob=max(get.probability(gene,aa,total.muts,total.samples,aa.length),min_prob)
 	alpha=get.alpha(k,aa,mu_prot)
 	prob=prob*alpha
@@ -66,26 +68,33 @@ get.pvalues=function(k, total.muts, aa.length, mu_prot, aa, gene,min_prob, total
 		lower.tail=FALSE,log.p=TRUE)/log(10,exp(1))
 }
 
-#' @name get.alpha
-#' @title returns the mutability of the codon given the gene
+
+#' @name combine
+#' @title returns the table and column names of table into a single string
 #' @description
 #'
-#' returns the mutability of the codon given the gene
+#' returns the table and column names of table into a single string
 #'
-#' @param k numeric first argument
-#' @param aa numeric second argument
-#' @param mu_pro numeric third argument
+#' @param tb numeric first argument
+#' @param sep character string second argument
 #' @return returns the table and column names of table into a single string
-
-# returns the table and column names of table into a single string 
-combine=function(tb,sep=":") {
+combine = function(tb, sep=":"){
 	out=paste(names(tb)[1],tb[1],sep=sep)
 	if(length(tb)>1) for(i in 2:length(tb)) out=paste(out,paste(names(tb)[i],tb[i],sep=sep),sep="|")
 	return(out)
 }
 
-# returns the number and types of mutant residues of the codon
-get.variant.aa=function(position,mf) {
+
+#' @name get.variant.aa
+#' @title returns the number and types of mutant residues of the codon
+#' @description
+#'
+#' returns the number and types of mutant residues of the codon
+#'
+#' @param position numeric first argument
+#' @param mf numeric second argument
+#' @return numeric (aa$mu_position[k]/mu_prot)
+get.variant.aa = function(position, mf){
 	mf=mf[ which(mf$Amino_Acid_Position==position), ]
 	variant=rev(sort(table(mf$Variant_Amino_Acid)))
 	variant=combine(variant)
@@ -96,8 +105,18 @@ get.variant.aa=function(position,mf) {
 	return(c(variant,codon,genomic_pos))
 }
 
-# returns the number of cancer types with the mutation
-get.cancer.type=function(position,mf,d=d) {
+
+#' @name get.cancer.type
+#' @title returns the number of cancer types with the mutation
+#' @description
+#'
+#' returns the number of cancer types with the mutation
+#'
+#' @param position numeric first argument
+#' @param mf numeric second argument
+#' @param d numeric third argument
+#' @return returns the number of cancer types with the mutation
+get.cancer.type = function(position, mf, d=d){
 	mf=mf[ mf$Amino_Acid_Position==position, ]
 	cnt=c()
 	for(i in unique(mf$TUMORTYPE)) {
@@ -113,13 +132,32 @@ get.cancer.type=function(position,mf,d=d) {
 	return(output)
 }
 
-# returns the count of tri-nucleotide contexts of the codon
-get.reference.tri=function(pos,maf) {
+
+#' @name get.reference.tri
+#' @title returns the count of tri-nucleotide contexts of the codon
+#' @description
+#'
+#' returns the count of tri-nucleotide contexts of the codon
+#'
+#' @param pos numeric first argument
+#' @param maf numeric second argument
+#' @return returns the count of tri-nucleotide contexts of the codon
+get.reference.tri = function(pos, maf){
 	table(maf$Ref_Tri[ which(maf$Amino_Acid_Position==pos) ])
 }
 
-# return the weighted average tri-nucleotide mutability of the codon
-get.mu.score=function(pos,maf,mu) {
+
+#' @name get.mu.score
+#' @title return the weighted average tri-nucleotide mutability of the codon
+#' @description
+#'
+#' return the weighted average tri-nucleotide mutability of the codon
+#'
+#' @param pos numeric first argument
+#' @param maf numeric second argument
+#' @param mu numeric third argument
+#' @return return the weighted average tri-nucleotide mutability of the codon
+get.mu.score = function(pos, maf, mu){
 	# given amino acid position, get count of all the reference tri-nucleotide context
 	t=get.reference.tri(pos,maf)
 	# get the mutability scores of those tri-nucleotides
@@ -128,29 +166,64 @@ get.mu.score=function(pos,maf,mu) {
 	return(sum(mu$mu[ind]*t)/sum(t))
 }
 
-# return the counts and types of tri-nucleotide contexts 
-get.all.tri=function(pos,maf){
+
+#' @name get.all.tri
+#' @title returns the mutability of the codon given the gene
+#' @description
+#'
+#' returns the mutability of the codon given the gene
+#'
+#' @param pos numeric first argument
+#' @param maf numeric second argument
+#' @return return the counts and types of tri-nucleotide contexts 
+get.all.tri = function(pos, maf){
 	t=rev(sort(table(maf$Ref_Tri[ which(maf$Amino_Acid_Position==pos) ])))
 	return(paste(names(t),collapse="|"))
 }
 
-# returns the reference amino acid 
-get.reference.aa=function(pos,maf) {
+
+#' @name get.reference.aa
+#' @title returns the reference amino acid 
+#' @description
+#'
+#' returns the reference amino acid 
+#'
+#' @param pos numeric first argument
+#' @param maf numeric second argument
+#' @return returns the reference amino acid 
+get.reference.aa = function(pos, maf){
 	tb=table(maf$Reference_Amino_Acid[ which(maf$Amino_Acid_Position==pos) ])
-	tb=tb[ order(tb,decreasing=T) ]
+	tb=tb[ order(tb,decreasing=TRUE) ]
 	return(combine(tb))
 }
 
-# returns dbSNP/1000G/NHLBI ids, if any
-get.rsid=function(pos,maf) {
+
+#' @name get.rsid
+#' @title returns dbSNP/1000G/NHLBI ids, if any
+#' @description
+#'
+#' returns dbSNP/1000G/NHLBI ids, if any
+#'
+#' @param pos numeric first argument
+#' @param maf numeric second argument
+#' @return returns dbSNP/1000G/NHLBI ids, if any
+get.rsid = function(pos, maf){
 	tb=table(maf$dbSNP_RS[ which(maf$Amino_Acid_Position==pos) ])
-	tb=tb[ order(tb,decreasing=T) ]
+	tb=tb[ order(tb,decreasing=TRUE) ]
 	if(length(tb)==1) if(names(tb)=='') return('')
 	return(combine(tb))
 }
 
-# return perentage into decimal
-convert.to.decimal=function(num){
+
+#' @name convert.to.decimal
+#' @title return perentage into decimal
+#' @description
+#'
+#' return perentage into decimal
+#'
+#' @param num numeric first argument
+#' @return numeric (aa$mu_position[k]/mu_prot)
+convert.to.decimal = function(num){
 	if(is.na(num)) return(NA)
 	if(grepl('%',num)) num=gsub('%','',num)
 	num=as.numeric(as.character(num))
@@ -158,31 +231,70 @@ convert.to.decimal=function(num){
 	return(num)
 }
 
-# return the variant allele frequency (VAF) ranks of the mutation in the sample
-get.sample.rank=function(sample,gene,pos,maf) {
+
+#' @name get.sample.rank
+#' @title returns the mutability of the codon given the gene
+#' @description
+#'
+#' return the variant allele frequency (VAF) ranks of the mutation in the sample
+#'
+#' @param sample numeric first argument
+#' @param gene numeric second argument
+#' @param pos numeric third argument
+#' @param maf numeric fourth argument
+#' @return return the variant allele frequency (VAF) ranks of the mutation in the sample
+get.sample.rank = function(sample, gene, pos, maf){
 	sample=d[ which(d$Master_ID==sample), ]
 	sample$allele_freq=as.numeric(as.character(unlist(lapply(sample$allele_freq,convert.to.decimal))))
-	af.rank=sort(unique(sample$allele_freq),decreasing=T)
+	af.rank=sort(unique(sample$allele_freq),decreasing=TRUE)
 	return(which(af.rank==max(sample$allele_freq[ which(sample$Hugo_Symbol==gene & sample$Amino_Acid_Position==pos) ]))/length(af.rank))
 }
 
-# return all the VAF ranks of the mutation in all samples with the mutation
-get.af.rank=function(pos,maf) {
+
+#' @name get.af.rank
+#' @title return all the VAF ranks of the mutation in all samples with the mutation
+#' @description
+#'
+#' return all the VAF ranks of the mutation in all samples with the mutation
+#'
+#' @param pos numeric first argument
+#' @param maf numeric second argument
+#' @return details
+get.af.rank = function(pos, maf){
 	samples=maf$Master_ID[ which(maf$Amino_Acid_Position==pos & !is.na(maf$allele_freq)) ]
 	if(length(samples)==0) return(c(NA,NA))
 	af.rank=unlist(lapply(samples,get.sample.rank,gene=unique(maf$Hugo_Symbol),pos=pos,maf=maf))
 	return(c(median(af.rank),paste(length(af.rank),paste(af.rank,collapse=':'),sep="|")))
 }
 
-# return the cancer cell fractions (CCF) of the mutation
-get.ccf=function(pos,maf) {
+
+#' @name get.ccf
+#' @title return the cancer cell fractions (CCF) of the mutation
+#' @description
+#'
+#' return the cancer cell fractions (CCF) of the mutation
+#'
+#' @param pos numeric first argument
+#' @param maf numeric second argument
+#' @return details
+get.ccf = function(pos, maf){
 	ccfs=maf$ccf[ which(maf$Amino_Acid_Position==pos & !is.na(maf$ccf)) ]
-	if(length(ccfs)==0) return(NA)
+	if(length(ccfs)==0){
+		return(NA)
+	}
 	return(paste(ccfs,collapse=":"))
 }
 
-# perform binomial test for all mutations observed in gene
-binom.test_snp=function(gene) {
+
+#' @name binom.test_snp
+#' @title perform binomial test for all mutations observed in gene
+#' @description
+#'
+#' perform binomial test for all mutations observed in gene
+#'
+#' @param gene numeric first argument
+#' @return perform binomial test for all mutations observed in gene
+binom.test_snp = function(gene){
 
 	# Reduce maf down to just of gene G
 	maf=d[ which(d$Hugo_Symbol==gene), ]
@@ -238,8 +350,17 @@ binom.test_snp=function(gene) {
 	return(output)
 }
 
-# return annotation track of hotspots with alignability/uniqueness scores (UCSC)
-annotate.bedGraph.tracks=function(df,bedgraph) {
+
+#' @name annotate.bedGraph.tracks
+#' @title return annotation track of hotspots with alignability/uniqueness scores (UCSC)
+#' @description
+#'
+#' return annotation track of hotspots with alignability/uniqueness scores (UCSC)
+#'
+#' @param df numeric first argument
+#' @param bedgraph numeric second argument
+#' @return numeric (aa$mu_position[k]/mu_prot)
+annotate.bedGraph.tracks = function(df, bedgraph){
 	# formating bedGraph file
 	setnames(bedgraph,old=colnames(bedgraph),new=c('chromosome','start','stop','score'))
 	bedgraph$chromosome=gsub('chr','',bedgraph$chromosome)
@@ -277,7 +398,7 @@ annotate.bedGraph.tracks=function(df,bedgraph) {
 	bedgraphgrange$width=NULL
 
 	# get alignability score from IRanges object
-	get.score=function(i) {
+	get.score = function(i) {
 		z=which(overlap$queryHits==i)
 		if(length(z)==0) return(NA)
 		s=max(bedgraphgrange$score[overlap$subjectHits[ z ]])
@@ -287,7 +408,7 @@ annotate.bedGraph.tracks=function(df,bedgraph) {
 	dirange=cbind(dirange,scores)
 
 	# returns matrix of genomic positions (chromosome, start position)
-	get.genomic.pos=function(i,df) {
+	get.genomic.pos = function(i,df) {
 		return(	matrix(unlist(strsplit(df$Genomic_Position[i],'[|:_]')),ncol=3,byrow=TRUE))
 	}
 
@@ -307,10 +428,20 @@ annotate.bedGraph.tracks=function(df,bedgraph) {
 	return(final_scores)
 }
 
-# return mutation calling centers (TCGA) of a given hotspot
-mut.center.breakdown=function(i,sig,maf) {
 
-	get.genomic.position=function(x,hs) {
+#' @name mut.center.breakdown
+#' @title return mutation calling centers (TCGA) of a given hotspot
+#' @description
+#'
+#' return mutation calling centers (TCGA) of a given hotspot
+#'
+#' @param i numeric first argument
+#' @param sig numeric second argument
+#' @param maf numeric third argument
+#' @return return mutation calling centers (TCGA) of a given hotspot
+mut.center.breakdown = function(i, sig, maf){
+
+	get.genomic.position = function(x,hs) {
 		pos=do.call('rbind',strsplit(unlist(strsplit(hs$Genomic_Position[x],'\\|')),'_'))
 		pos=matrix(do.call('rbind',strsplit(pos[,1],':')),ncol=2)
 		out=c()
@@ -318,7 +449,7 @@ mut.center.breakdown=function(i,sig,maf) {
 		return(paste(out,collapse=":"))
 	}
 
-	get.sequencing.centers=function(pos,maf) {
+	get.sequencing.centers = function(pos,maf) {
 		b=pos
 		chr=unlist(strsplit(pos,' '))[1]
 		pos=as.numeric(unlist(strsplit(pos,' '))[2])
@@ -337,8 +468,17 @@ mut.center.breakdown=function(i,sig,maf) {
 	return(c(sig$Hugo_Symbol[i],sig$Amino_Acid_Position[i],names(out)[ which(out==max(out))][1], max(out),sum(out),max(out)/sum(out),paste(tt,collapse=":")))
 }
 
-# return TRUE|FALSE of hotspots with putative mutation calling center bias
-annotate.center.bias=function(sig,maf) {
+
+#' @name annotate.center.bias
+#' @title return TRUE|FALSE of hotspots with putative mutation calling center bias
+#' @description
+#'
+#' return TRUE|FALSE of hotspots with putative mutation calling center bias
+#'
+#' @param sig numeric first argument
+#' @param maf numeric second argument
+#' @return return TRUE|FALSE of hotspots with putative mutation calling center bias
+annotate.center.bias = function(sig, maf){
 
 	# initialize variables
 	sig$Samples=as.character(sig$Samples)
@@ -348,7 +488,7 @@ annotate.center.bias=function(sig,maf) {
 
 	maf$tm=paste(maf$Hugo_Symbol,maf$Amino_Acid_Position)
 
-	major.tumortype=function(x,hs) {
+	major.tumortype = function(x,hs) {
 		samples=do.call('rbind',strsplit(unlist(strsplit(hs$Samples[x],'\\|')),':'))
 		count=as.numeric(as.vector(samples[,3]))
 		return(c(samples[1,1],count[1],sum(count)))
@@ -371,7 +511,7 @@ annotate.center.bias=function(sig,maf) {
 	tm$total=as.numeric(as.character(tm$total))
 
 	tm$ratio=tm$from_major/tm$total
-	tm=tm[ order(tm$ratio,decreasing=T), ]
+	tm=tm[ order(tm$ratio,decreasing=TRUE), ]
 	tm=tm[ which(!grepl(',',tm$major_calling_center)), ]
 	tm$idx=paste(tm$gene,tm$aa_position)
 	tm$num_tt=unlist(lapply(tm$idx,function(x) length(unique(maf$TUMORTYPE[ which(maf$tm==x) ]))))
@@ -386,8 +526,17 @@ annotate.center.bias=function(sig,maf) {
 
 }
 
+#' @name annotate.entropy
+#' @title return calculcated entropy around the site of each hotspot
+#' @description
+#'
+#' return calculcated entropy around the site of each hotspot
+#'
+#' @param sig numeric first argument
+#' @return numeric (aa$mu_position[k]/mu_prot)
+
 # return calculcated entropy around the site of each hotspot
-annotate.entropy=function(sig) {
+annotate.entropy = function(sig){
 	
 	# find genomic position of hotspot
 	hspos=lapply(strsplit(sig$Genomic_Position,"[|]"),function(x) gsub("_.*$","",x))
@@ -403,7 +552,7 @@ annotate.entropy=function(sig) {
 	ends=c(rep.int(as.numeric(hspos[,2]),3),as.numeric(hspos[,3])+11,as.numeric(hspos[,3])+23,as.numeric(hspos[,3])+35)
 	contigs=rep.int(hspos[,1],6)
 	for(pad in c(11,23,35)) {
-		rcontigs=sample(seqnames(Hsapiens)[1:23],1000,replace=T)
+		rcontigs=sample(seqnames(Hsapiens)[1:23],1000,replace=TRUE)
 		rstarts=unlist(lapply(rcontigs,function(x) sample(seqlengths(Hsapiens)[x]-(pad+1),1)))
 		rends=rstarts+pad
 		starts=c(starts,rstarts)
@@ -424,8 +573,17 @@ annotate.entropy=function(sig) {
 	return(sig[,(ncol(sig)-2):ncol(sig)])
 }
 
-# return TRUE|FALSE of whether hotspot is a true positive
-annotate.true.positives=function(sig,dmp) {
+
+#' @name annotate.true.positives
+#' @title return TRUE|FALSE of whether hotspot is a true positive
+#' @description
+#'
+#' return TRUE|FALSE of whether hotspot is a true positive
+#'
+#' @param sig numeric first argument
+#' @param dmp numeric second argument
+#' @return numeric TRUE|FALSE of whether hotspot is a true positive
+annotate.true.positives = function(sig, dmp){
 
 	# return TRUE if hotspot mutation is in true-positive file
 	tp=rep(FALSE,nrow(sig))
@@ -434,11 +592,21 @@ annotate.true.positives=function(sig,dmp) {
 	return(tp)
 }
 
-# return homopolyer region, if any, of a given hotspot
-get.repeats=function(i,sig,rr) {
+
+#' @name get.repeats
+#' @title homopolyer region, if any, of a given hotspot
+#' @description
+#'
+#' homopolyer region, if any, of a given hotspot
+#'
+#' @param i numeric first argument
+#' @param sig numeric second argument
+#' @param rr third argument
+#' @return homopolyer region, if any, of a given hotspot
+get.repeats = function(i, sig, rr){
 
 	# initialize homopolymer file
-	gene_pos=as.data.frame(matrix(unlist(strsplit(sig$Genomic_Position[i],'[_:|]')),ncol=3,byrow=T))
+	gene_pos=as.data.frame(matrix(unlist(strsplit(sig$Genomic_Position[i],'[_:|]')),ncol=3,byrow=TRUE))
 	colnames(gene_pos)=c('chromosome','pos','count')
 	gene_pos$chromosome=paste('chr',as.character(gene_pos$chromosome),sep="")
 	gene_pos$chromosome=as.character(gene_pos$chromosome)
@@ -457,8 +625,16 @@ get.repeats=function(i,sig,rr) {
 
 }
 
-# return homopolymer region metrics: TRUE|FALSE if it is a repeat region, the repeat nucleotide(s), and length of repeat region
-annotate.homopolymers=function(sig,homopolymerbed) {
+#' @name annotate.homopolymers
+#' @title homopolymer region metrics: TRUE|FALSE if it is a repeat region, the repeat nucleotide(s), and length of repeat region
+#' @description
+#'
+#' homopolymer region metrics: TRUE|FALSE if it is a repeat region, the repeat nucleotide(s), and length of repeat region
+#'
+#' @param sig numeric first argument
+#' @param homopolymerbed numeric second argument
+#' @return homopolymer region metrics: TRUE|FALSE if it is a repeat region, the repeat nucleotide(s), and length of repeat region
+annotate.homopolymers = function(sig, homopolymerbed){
 
 	# find overlap
 	rep_range=RangedData(IRanges(homopolymerbed$start,homopolymerbed$end),
@@ -470,8 +646,16 @@ annotate.homopolymers=function(sig,homopolymerbed) {
 
 }
 
-# return filtering judgement based on annotated metrics
-annotate.filtering.judgement=function(sig) {
+
+#' @name annotate.filtering.judgement
+#' @title return filtering judgement based on annotated metrics
+#' @description
+#'
+#' return filtering judgement based on annotated metrics
+#'
+#' @param sig numeric first argument
+#' @return return filtering judgement based on annotated metrics
+annotate.filtering.judgement = function(sig){
 
 	reason=rep('',nrow(sig))
 	sig$Hugo_Symbol=as.character(sig$Hugo_Symbol)
@@ -541,7 +725,16 @@ annotate.filtering.judgement=function(sig) {
 }
 
 
-split.double=function(ind,df) {
+#' @name split.double
+#' @title details
+#' @description
+#'
+#' details
+#'
+#' @param ind numeric first argument
+#' @param df numeric second argument
+#' @return numeric (aa$mu_position[k]/mu_prot)
+split.double = function(ind, df){
 	ref=unlist(strsplit(df$Reference_Amino_Acid[ind],''))
 	vart=unlist(strsplit(df$Variant_Amino_Acid[ind],''))
 	out=c()
@@ -560,28 +753,65 @@ split.double=function(ind,df) {
 	return(out)
 }
 
-#returns other positions that are 1 bp away from pos
-find.splice.neighbors=function(pos,df) {
+
+#' @name find.splice.neighbors
+#' @title returns the mutability of the codon given the gene
+#' @description
+#'
+#' returns other positions that are 1 bp away from pos
+#'
+#' @param pos numeric first argument
+#' @param df numeric second argument
+#' @return returns other positions that are 1 bp away from pos
+find.splice.neighbors = function(pos, df){
 	dif=abs(df$Amino_Acid_Position-pos)
 	ind=which(dif==1)
 	if(length(ind)==0) return(NA)
 	return(unique(c(pos,df$Amino_Acid_Position[ind])))
 }
-#returns TRUE if there are other positions that are 1 bp away
-any.neighbors=function(df) {
+
+
+#' @name any.neighbors
+#' @title returns TRUE if there are other positions that are 1 bp away
+#' @description
+#'
+#' returns TRUE if there are other positions that are 1 bp away
+#'
+#' @param df numeric first argument
+#' @return returns TRUE if there are other positions that are 1 bp away
+any.neighbors = function(df){
 	tm=sort(unique(df$Amino_Acid_Position))
 	tt=lapply(tm,find.splice.neighbors,df=df)
 	if(length(which(!is.na(tt))) > 0) return(TRUE)
 	return(FALSE)
 }
 
-#returns the first occurance of a neighbor
-get.neighbors=function(df) {
+#' @name get.neighbors
+#' @title returns the first occurance of a neighbor
+#' @description
+#'
+#' returns the first occurance of a neighbor
+#'
+#' @param df numeric first argument
+#' @return details
+get.neighbors = function(df){
 	tm=sort(unique(df$Amino_Acid_Position))
 	tt=lapply(tm,find.splice.neighbors,df=df)
 	return(tt[[which(!is.na(tt))[1]]])
 }
-remove.unexpressed.genes=function(i,maf,express) {
+
+
+#' @name remove.unexpressed.genes
+#' @title details
+#' @description
+#'
+#' details
+#'
+#' @param i numeric first argument
+#' @param maf numeric second argument
+#' @param express numeric third argument
+#' @return details
+remove.unexpressed.genes = function(i ,maf, express){
 	
 	#coad samples
 	if(maf$TUMORTYPE[i]=='coadread') {
@@ -620,15 +850,33 @@ remove.unexpressed.genes=function(i,maf,express) {
 
 }
 
-# deprecated germline SNP filtering based on 1000/NHLBI
-# putative germline SNPs are filtered based on ExAC with minor AF > 0.06%
-# ExAC r0.2 has been preloaded 
-remove.snps=function(maf) {
+
+#' @name remove.snps
+#' @title deprecated germline SNP filtering based on 1000/NHLBI
+#' @description
+#'
+#' deprecated germline SNP filtering based on 1000/NHLBI
+#' putative germline SNPs are filtered based on ExAC with minor AF > 0.06%
+#' ExAC r0.2 has been preloaded 
+#'
+#' @param maf character string Path to MAF
+#' @return numeric (aa$mu_position[k]/mu_prot)
+remove.snps = function(maf){
 	return(maf[ which(!paste(maf$Chromosome,maf$Start_Position,maf$Tumor_Seq_Allele2) 
 		%in% paste(exacr0_2snps$Chromosome,exacr0_2snps$Position,exacr0_2snps$Alt)), ])
 }
 
-remove.unexpressed.mutations=function(maf,expressiontb) {
+
+#' @name remove.unexpressed.mutations
+#' @title remove unexpressed mutations
+#' @description
+#'
+#' remove unexpressed mutations (revise)
+#'
+#' @param maf character string Path to MAF
+#' @param expressiontb numeric second argument
+#' @return MAF
+remove.unexpressed.mutations = function(maf, expressiontb){
 	ind=unlist(lapply(1:nrow(maf),remove.unexpressed.genes,maf=maf,express=expressiontb))
 	ind=which(ind)
 	if(any(ind)) maf=maf[ -ind, ]
@@ -636,8 +884,16 @@ remove.unexpressed.mutations=function(maf,expressiontb) {
 }
 
 
-
-prepmaf=function(maf,expressiontb) {
+#' @name prepmaf
+#' @title prep the MAF
+#' @description
+#'
+#' prep the MAF (revise)
+#'
+#' @param maf character string Path to MAF
+#' @param expressiontb numeric second argument
+#' @return MAF
+prepmaf = function(maf, expressiontb){
 
 	cat('Prepping MAF for analysis ...\n')
 	#only non-indel, coding mutations
@@ -649,8 +905,12 @@ prepmaf=function(maf,expressiontb) {
 	maf=maf[ which(!maf$Variant_Type%in%c('INS','DEL')), ]
 
 	# add additional annotations
-	if(!'TUMORTYPE' %in% colnames(maf)) maf$TUMORTYPE='none'
-	if(!'Master_ID' %in% colnames(maf)) maf$Master_ID=maf$Tumor_Sample_Barcode
+	if(!'TUMORTYPE' %in% colnames(maf)){
+		maf$TUMORTYPE='none'
+	}
+	if(!'Master_ID' %in% colnames(maf)){
+		maf$Master_ID=maf$Tumor_Sample_Barcode
+	}
 	maf$Amino_Acid_Change=gsub('p.','',maf$HGVSp_Short)
 	maf$Amino_Acid_Position=unlist(lapply(maf$Protein_position,function(x) unlist(strsplit(x,"/"))[1] ))
 	maf$Protein_Length=as.numeric(unlist(lapply(maf$Protein_position,function(x) unlist(strsplit(x,'\\/'))[2])))
@@ -698,7 +958,7 @@ prepmaf=function(maf,expressiontb) {
 
 	# remove mutations in unexpressed genes
 	cat(' ... Removing unexpressed genes\n')
-	maf=remove.unexpressed.mutations(maf,expressiontb)
+	maf=remove.unexpressed.mutations(maf, expressiontb)
 	maf$Amino_Acid_Position=as.numeric(maf$Amino_Acid_Position)
 	maf$Variant_Type='SNP'
 

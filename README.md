@@ -5,7 +5,6 @@
 ## Identifying recurrent mutations in cancer
 
 [<img target="_blank" align="right" border="0" alt="" src="cbioportal_logo.png" width="125" height="30">](http://www.cbioportal.org/) 
-[<img align="right" border="0" alt="" src="oncokb.png" width="30" height="30">](http://oncokb.org/)
 
 ### Description
 
