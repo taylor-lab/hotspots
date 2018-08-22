@@ -1,8 +1,24 @@
 
 # functions for hotspot_algo.R
 
-# returns baseline expected probability given gene length, gene mutation burden, and total samples
-get.probability=function(gene,aa,total.muts,total.samples,aa.length) {
+#' @import data.table
+#' @import IRanges
+#' @import BSgenome.Hsapiens.UCSC.hg19
+
+
+#' @name get.probability
+#' @title returns baseline expected probability given gene length, gene mutation burden, and total samples
+#' @description
+#'
+#' returns baseline expected probability given gene length, gene mutation burden, and total samples
+#'
+#' @param gene numeric first argument
+#' @param aa numeric second argument
+#' @param total.muts numeric third argument
+#' @param total.samples numeric fourth argument
+#' @param aa.length numeric fifth argument
+#' @return numeric (1/aa.length)*(total.muts/total.samples)
+get.probability=function(gene, aa, total.muts, total.samples, aa.length) {
 	top=sum(aa$count[which(aa$toohot)])
 	aa.length=aa.length-length(which(aa$toohot))
 	total.muts=total.muts-top

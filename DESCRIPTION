@@ -1,0 +1,27 @@
+Package: hotspots
+Title: Identify recurrent mutations in cancer
+Version: 1.0.0.000
+Authors@R: c(
+  person("Evan", "Biederstedt", role=c("aut","cre"), email="biederse@mskcc.org"),
+  person("Matthew", "Chang", role="aut", email="changmt@cbio.mskcc.org"))
+Description: Statistical algorithm to identify recurrently mutated residues in tumor samples
+biocViews: 
+Depends:
+    R (>= 3.1.0),
+    data.table (>= 1.10)
+Imports:
+    IRanges (>= 2.12),
+    S4Vectors (>= 0.4),
+    GenomeInfoDb (>= 1.13),
+    parallel,
+    BiocGenerics(>= 0.24),
+    methods,
+    Matrix,
+    stringr,
+    BSgenome.Hsapiens.UCSC.hg19
+Suggests:
+    testthat
+License: GNU Affero General Public License v3.0
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.1.0
