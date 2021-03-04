@@ -589,10 +589,10 @@ prepmaf=function(maf,expressiontb) {
 	cat('Prepping MAF for analysis ...\n')
 	#only non-indel, coding mutations
 	
-  # coding=c('initiator_codon_variant','missense_variant','splice_acceptor_variant', 'splice_donor_variant','stop_gained','stop_lost','stop_retained_variant','synonymous_variant')
+  coding=c('initiator_codon_variant','missense_variant','splice_acceptor_variant', 'splice_donor_variant','stop_gained','stop_lost','stop_retained_variant','synonymous_variant','inframe_insertion',"inframe_deletion","frameshift_truncation")
 	
   cat(' ... Reducing MAF to protein-coding substitutions\n')
-	maf=maf[ which(maf$CANONICAL=='YES' & maf$BIOTYPE=='protein_coding'), ]
+  maf <- maf[ which(maf$Consequence %in% coding & maf$CANONICAL=='YES' & maf$BIOTYPE=='protein_coding'), ]
 	
 	# remove indels
 	# maf=maf[ which(!maf$Variant_Type%in%c('INS','DEL')), ]
