@@ -17,8 +17,9 @@ Install dependent packages (**data.table**, **IRanges**, **BSgenome.Hsapiens.UCS
 
 ```
 install.packages("data.table")
-source("http://bioconductor.org/biocLite.R")
-biocLite("IRanges","BSgenome.Hsapiens.UCSC.hg19")
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install(c("IRanges","BSgenome.Hsapiens.UCSC.hg19"))
 ```
 
 ####Usage:

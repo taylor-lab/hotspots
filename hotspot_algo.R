@@ -141,12 +141,11 @@ cat('\nReading in MAF...\n')
 d=read.csv(maf_fn,header=T,as.is=T,sep="\t",comment.char='#')
 d=prepmaf(d,expressiontb)
 
-
 # writing temp files to annotate MAF with trinucleotides
 write.table(d,'___temp_maf.tm',row.names=F,quote=F,sep="\t")
 system(command='python make_trinuc_maf.py ___temp_maf.tm ___temp_maf-tri.tm')
-# clean up tmp files
 d=read.csv('___temp_maf-tri.tm',header=T,as.is=T,sep="\t",comment.char='#')
+# clean up tmp files
 system(command='rm ___t*')
 cat('\nFinished prepping MAF!\n')
 
@@ -164,6 +163,7 @@ if(GENES_INTEREST) {
 }
 
 # run algorithm
+d$Chromosome <- gsub("chr","",d$Chromosome)
 cat('Running algorithm...\n')
 output=lapply(genes,binom.test_snp)
 output=do.call('rbind',output)
