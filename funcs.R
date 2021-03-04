@@ -588,27 +588,45 @@ prepmaf=function(maf,expressiontb) {
 
 	cat('Prepping MAF for analysis ...\n')
 	#only non-indel, coding mutations
-	coding=c('initiator_codon_variant','missense_variant','splice_acceptor_variant',
-		'splice_donor_variant','stop_gained','stop_lost','stop_retained_variant','synonymous_variant')
-	cat(' ... Reducing MAF to protein-coding substitutions\n')
-	maf=maf[ which(maf$Consequence %in% coding & maf$CANONICAL=='YES' & maf$BIOTYPE=='protein_coding'), ]
-	#remove indels
-	maf=maf[ which(!maf$Variant_Type%in%c('INS','DEL')), ]
+	
+  # coding=c('initiator_codon_variant','missense_variant','splice_acceptor_variant', 'splice_donor_variant','stop_gained','stop_lost','stop_retained_variant','synonymous_variant')
+	
+  cat(' ... Reducing MAF to protein-coding substitutions\n')
+	maf=maf[ which(maf$CANONICAL=='YES' & maf$BIOTYPE=='protein_coding'), ]
+	
+	# remove indels
+	# maf=maf[ which(!maf$Variant_Type%in%c('INS','DEL')), ]
 
 	# add additional annotations
 	if(!'TUMORTYPE' %in% colnames(maf)) maf$TUMORTYPE='none'
 	if(!'Master_ID' %in% colnames(maf)) maf$Master_ID=maf$Tumor_Sample_Barcode
 	maf$Amino_Acid_Change=gsub('p.','',maf$HGVSp_Short)
-	maf$Amino_Acid_Position=unlist(lapply(maf$Protein_position,function(x) unlist(strsplit(x,"/"))[1] ))
-	maf$Protein_Length=as.numeric(unlist(lapply(maf$Protein_position,function(x) unlist(strsplit(x,'\\/'))[2])))
-	maf$Reference_Amino_Acid=unlist(lapply(1:nrow(maf), function(x) unlist(strsplit(maf$Amino_acids[x],'/'))[1]))
-	maf$Variant_Amino_Acid=unlist(lapply(1:nrow(maf), function(x) unlist(strsplit(maf$Amino_acids[x],'/'))[2]))
+	
+	# maf$Amino_Acid_Position=unlist(lapply(maf$Protein_position,function(x) unlist(strsplit(x,"/"))[1] ))
+	source('https://raw.githubusercontent.com/dchakro/shared_Rscripts/master/MutSiteFind.R')
+	maf$Amino_Acid_Position <- MutSiteFind(gsub("p.","",maf$HGVSp_Short))
+	
+	# maf$Protein_Length=as.numeric(unlist(lapply(maf$Protein_position,function(x) unlist(strsplit(x,'\\/'))[2])))
+	maf$Protein_Length <- rep(0)
+	maf$Protein_Length[maf$Hugo_Symbol=="EGFR"] <- 1210
+	maf$Protein_Length[maf$Hugo_Symbol=="ERBB2"] <- 1255
+	maf$Protein_Length[maf$Hugo_Symbol=="ERBB3"] <- 1342
+	maf$Protein_Length[maf$Hugo_Symbol=="ERBB4"] <- 1308
+	
+	# maf$Reference_Amino_Acid=unlist(lapply(1:nrow(maf), function(x) unlist(strsplit(maf$Amino_acids[x],'/'))[1]))
+	# maf$Variant_Amino_Acid=unlist(lapply(1:nrow(maf), function(x) unlist(strsplit(maf$Amino_acids[x],'/'))[2]))
+	mut <- gsub("p.","",maf$HGVSp_Short,fixed = T)
+	idx <- stringi::stri_locate_first_regex(str = mut, pattern = "[[:digit:]]+")
+	maf$Reference_Amino_Acid <- stringi::stri_sub(str = mut,from = 0,to = idx[,1]-1)
+	maf$Variant_Amino_Acid <- stringi::stri_sub(str = mut,from = idx[,2]+1)
+	rm(idx)
+
 	maf$allele_freq=maf$t_alt_count/(maf$t_alt_count+maf$t_ref_count)
 
 	#subset splice_site mutations
-	splice=c('splice_acceptor_variant','splice_donor_variant')
-	ss=maf[ which(maf$Consequence %in% splice), ]
-	maf=maf[ which(!maf$Consequence %in% splice), ]
+	# splice=c('splice_acceptor_variant','splice_donor_variant')
+	# ss=maf[ which(maf$Consequence %in% splice), ]
+	# maf=maf[ which(!maf$Consequence %in% splice), ]
 
 	cat(' ... Re-annotating substitutions\n')
 	# annotating oligo mutations
@@ -622,22 +640,23 @@ prepmaf=function(maf,expressiontb) {
 		maf=maf[-i, ]
 		maf=rbind(maf,tm)
 	}
+	
 	# annotating splice site mutations
-	ss=ss[ nchar(ss$Reference_Allele)<3, ]
-	ss$Amino_Acid_Position=as.numeric(ss$Start_Position)
-	ss$Reference_Amino_Acid='SS'
-	ss$Variant_Amino_Acid='SS'
-	out=c()
-	for(i in unique(ss$Chromosome)) {
-		tm=ss[ ss$Chromosome==i, ]
-		while(any.neighbors(tm)) {
-			neighbors=get.neighbors(tm)
-			tm$Amino_Acid_Position[ tm$Amino_Acid_Position %in% neighbors ]=min(neighbors)
-		}
-		out=rbind(out,tm)
-	}
-	ss=out
-	maf=rbind(maf,ss)
+	# ss=ss[ nchar(ss$Reference_Allele)<3, ]
+	# ss$Amino_Acid_Position=as.numeric(ss$Start_Position)
+	# ss$Reference_Amino_Acid='SS'
+	# ss$Variant_Amino_Acid='SS'
+	# out=c()
+	# for(i in unique(ss$Chromosome)) {
+	# 	tm=ss[ ss$Chromosome==i, ]
+	# 	while(any.neighbors(tm)) {
+	# 		neighbors=get.neighbors(tm)
+	# 		tm$Amino_Acid_Position[ tm$Amino_Acid_Position %in% neighbors ]=min(neighbors)
+	# 	}
+	# 	out=rbind(out,tm)
+	# }
+	# ss=out
+	# maf=rbind(maf,ss)
 
 	# remove putative germline mutations
 	cat(' ... Removing putative germline SNPs based on ExAC r0.2\n')
@@ -648,6 +667,5 @@ prepmaf=function(maf,expressiontb) {
 	maf=remove.unexpressed.mutations(maf,expressiontb)
 	maf$Amino_Acid_Position=as.numeric(maf$Amino_Acid_Position)
 	maf$Variant_Type='SNP'
-
 	return(maf)
 }

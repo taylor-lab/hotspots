@@ -33,19 +33,19 @@ for line in fromf:
 tmpf.write(join(map(lambda x: join(x, '\t'), lines), '\n'))
 tmpf.flush()
 
+
 # Make bed file of regions
 print " ... Making bed file"
 grep_ps = subprocess.Popen(["grep", "-Ev", "^#|^Hugo", "___tmp.maf"], stdout=subprocess.PIPE)
-cut_ps = subprocess.Popen("cut -f5-7".split(" "), stdin=grep_ps.stdout, stdout=subprocess.PIPE)
+cut_ps = subprocess.Popen("cut -f4-6".split(" "), stdin=grep_ps.stdout, stdout=subprocess.PIPE)
 awk_ps = subprocess.Popen(["awk", "{OFS=\"\\t\"; print $1,$2-2,$3+1}"], stdin=cut_ps.stdout, stdout=subprocess.PIPE)
 bedf = open("___tmp.bed","w")
 bedf.write(awk_ps.communicate()[0])
 bedf.close()
 
-
 # Fetch regions
 print " ... Getting regions"
-subprocess.call("bedtools getfasta -tab -fi /ifs/depot/assemblies/H.sapiens/GRCh37/gr37.fasta -bed ___tmp.bed -fo ___tmp.tsv".split(" "))
+subprocess.call("bedtools getfasta -tab -fi /Volumes/DATA/Seafile/Bioinfo-Lab-Data/Ref.Genome/hg19/hg19.fa -bed ___tmp.bed -fo ___tmp.tsv".split(" "))
 
 # Add trinuc to lines
 print " ... Adding trinucs (normalized to start from C or T)"
