@@ -1,3 +1,4 @@
+# To capture everything and then filter later on
 ./hotspot_algo.R \
 	--input-maf=ERBBs/Data/ERBBS.maf \
 	--rdata=hotspot_algo.Rdata \
