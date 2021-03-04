@@ -3,7 +3,8 @@
 	--input-maf=ERBBs/Data/ERBBS.maf \
 	--rdata=hotspot_algo.Rdata \
 	--output-file=ERBBs/sig_hotspots.txt \
-	--homopolymer=FALSE
+	--homopolymer=FALSE \
+	--qval=1
 
 mv putative_false_positive_mutations.txt ERBBs/.
 
